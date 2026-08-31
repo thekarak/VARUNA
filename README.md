@@ -894,7 +894,7 @@ This approach can help reduce investigation time, prioritize suspicious maritime
 | **Sourasis Karak**       | Backend & Core ML Design        |
 | **Shibam Kundu**         | Data Engineering                |
 | **Pallabi Sarkar**       | UI/UX Design & Product Analysis |
-| **Debarpan Chakroborty** | Frontend Development            |
+| **Debarpan Chakraborty** | Frontend Development            |
 | **Sourav Sarkar**        | Database Administration         |
 
 ---
