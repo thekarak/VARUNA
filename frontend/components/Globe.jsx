@@ -12,7 +12,7 @@ function Globe() {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 2000);
-    camera.position.set(0, 0, 360);
+    camera.position.set(0, 0, 410);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,

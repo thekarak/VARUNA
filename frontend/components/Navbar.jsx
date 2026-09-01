@@ -9,10 +9,10 @@ function Navbar() {
         </a>
 
         <nav className="hidden md:flex items-center gap-8 text-xs sm:text-sm font-medium text-slate-400">
-          <a href="#" className="hover:text-white transition-colors">Pillars</a>
-          <a href="#" className="hover:text-white transition-colors">Impact</a>
-          <a href="#" className="hover:text-white transition-colors">Forensics</a>
-          <a href="#" className="hover:text-white transition-colors">Contact</a>
+          <a href="#" className="hover:text-white transition-colors">Mission</a>
+          <a href="#" className="hover:text-white transition-colors">How it works</a>
+          <a href="#" className="hover:text-white transition-colors">Technology</a>
+          <a href="#" className="hover:text-white transition-colors">About</a>
         </nav>
 
         <div>
