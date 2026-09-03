@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Next.js build output
+.next/
+frontend/.next/
+out/
+build/
+dist/
+
+# Environment variables (Protect secrets & API keys)
+.env
+.env*.local
+frontend/.env
+frontend/.env*.local
+!frontend/.env.example
+!.env.example
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+
+# Database volumes
+pgdata/
+
+# OS / Editor / Logs
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/

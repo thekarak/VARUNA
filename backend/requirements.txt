@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+geoalchemy2
+psycopg2-binary
+python-dotenv
+celery
+redis
+pyproj
+numpy
