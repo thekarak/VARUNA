@@ -107,6 +107,12 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   }, []);
 
   useEffect(() => {
+    if (mapInstanceRef.current && center) {
+      mapInstanceRef.current.setView(center, zoom, { animate: true });
+    }
+  }, [center, zoom]);
+
+  useEffect(() => {
     if (!mapInstanceRef.current || !layersGroupRef.current) return;
     import('leaflet').then((L) => {
       renderLayers(L, mapInstanceRef.current, layersGroupRef.current);

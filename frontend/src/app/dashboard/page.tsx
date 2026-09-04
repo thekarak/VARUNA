@@ -9,6 +9,111 @@ import { ForensicCaseFileModal } from '../../components/ForensicCaseFileModal';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
+export interface PresetScenario {
+  id: string;
+  name: string;
+  category: 'West Coast' | 'East Coast' | 'Strategic Chokepoints';
+  lat: string;
+  lon: string;
+  description: string;
+}
+
+export const PRESET_SCENARIOS: PresetScenario[] = [
+  // West Coast
+  {
+    id: 'mumbai-offshore',
+    name: 'Mumbai Offshore',
+    category: 'West Coast',
+    lat: '18.9000',
+    lon: '72.5000',
+    description: 'High-density commercial shipping channel off Mumbai Harbor.',
+  },
+  {
+    id: 'mumbai-high',
+    name: 'Mumbai High Oilfields',
+    category: 'West Coast',
+    lat: '19.4200',
+    lon: '71.3100',
+    description: 'Offshore crude extraction platforms & undersea pipeline corridor.',
+  },
+  {
+    id: 'gulf-kutch',
+    name: 'Gulf of Kutch (Vadinar)',
+    category: 'West Coast',
+    lat: '22.4500',
+    lon: '69.7200',
+    description: 'Primary crude oil import hub with sensitive marine national biosphere.',
+  },
+  {
+    id: 'jnpt-anchorage',
+    name: 'JNPT Port Anchorage',
+    category: 'West Coast',
+    lat: '19.1200',
+    lon: '72.7500',
+    description: 'Major container roadstead anchorage with congested traffic.',
+  },
+  {
+    id: 'cochin-lane',
+    name: 'Cochin / Lakshadweep Sea',
+    category: 'West Coast',
+    lat: '9.9600',
+    lon: '76.2200',
+    description: 'Southern tanker channel connecting Middle East and East Asia.',
+  },
+
+  // East Coast & Bay of Bengal
+  {
+    id: 'vizag-outer',
+    name: 'Visakhapatnam Roads',
+    category: 'East Coast',
+    lat: '17.6800',
+    lon: '83.3500',
+    description: 'Eastern naval command approaches and crude refinery deepwater berths.',
+  },
+  {
+    id: 'haldia-sandheads',
+    name: 'Haldia Sandheads',
+    category: 'East Coast',
+    lat: '21.6000',
+    lon: '88.0500',
+    description: 'Hooghly estuary navigational fairway with heavy bulk carrier traffic.',
+  },
+  {
+    id: 'gulf-mannar',
+    name: 'Gulf of Mannar / Palk Strait',
+    category: 'East Coast',
+    lat: '9.1500',
+    lon: '79.2000',
+    description: 'India-Sri Lanka international strait & coral reef biosphere reserve.',
+  },
+
+  // Strategic Chokepoints & Dark Tanker Corridors
+  {
+    id: 'arabian-sea',
+    name: 'Arabian Sea Corridor',
+    category: 'Strategic Chokepoints',
+    lat: '18.5500',
+    lon: '72.4000',
+    description: 'Deep-sea international transit lane 80km off the continental shelf.',
+  },
+  {
+    id: 'malacca-gateway',
+    name: 'Malacca Strait Gateway',
+    category: 'Strategic Chokepoints',
+    lat: '5.6000',
+    lon: '95.3000',
+    description: 'Great Channel entrance off Andaman & Nicobar islands.',
+  },
+  {
+    id: 'strait-hormuz',
+    name: 'Strait of Hormuz Corridor',
+    category: 'Strategic Chokepoints',
+    lat: '26.5600',
+    lon: '56.2500',
+    description: 'Global petroleum chokepoint with high AIS transponder manipulation.',
+  },
+];
+
 export default function ForensicDashboardPage() {
   const [taskId, setTaskId] = useState<string>('');
   const [status, setStatus] = useState<string>('IDLE');
@@ -16,9 +121,12 @@ export default function ForensicDashboardPage() {
   const [backendHealthy, setBackendHealthy] = useState<boolean | null>(null);
   const [caseModalOpen, setCaseModalOpen] = useState(false);
 
+  const [selectedScenarioId, setSelectedScenarioId] = useState<string>('mumbai-offshore');
+  const [categoryFilter, setCategoryFilter] = useState<'ALL' | 'West Coast' | 'East Coast' | 'Strategic Chokepoints'>('ALL');
+
   const [imageUrl, setImageUrl] = useState('https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1200&q=80');
-  const [lat, setLat] = useState('18.90');
-  const [lon, setLon] = useState('72.50');
+  const [lat, setLat] = useState('18.9000');
+  const [lon, setLon] = useState('72.5000');
 
   const [suspects, setSuspects] = useState<Suspect[]>([]);
   const [driftOrigin, setDriftOrigin] = useState<{ latitude: number; longitude: number; time_of_discharge?: string } | undefined>(undefined);
@@ -34,10 +142,11 @@ export default function ForensicDashboardPage() {
   }, []);
 
   // Preset scenarios
-  const applyPreset = (presetLat: string, presetLon: string, name: string) => {
-    setLat(presetLat);
-    setLon(presetLon);
-    setMessage(`Loaded scenario: ${name}`);
+  const applyPreset = (preset: PresetScenario) => {
+    setSelectedScenarioId(preset.id);
+    setLat(preset.lat);
+    setLon(preset.lon);
+    setMessage(`Loaded scenario: ${preset.name} (${preset.lat}°N, ${preset.lon}°E)`);
   };
 
   // Generate slick polygon around coordinate
@@ -326,29 +435,72 @@ export default function ForensicDashboardPage() {
         </div>
 
         {/* Scenario Quick-Picks */}
-        <div className="mt-4 pt-3 border-t border-slate-800/80 flex flex-wrap items-center gap-2 text-xs font-mono">
-          <span className="text-slate-500">Quick Scenarios:</span>
-          <button
-            type="button"
-            onClick={() => applyPreset('18.9000', '72.5000', 'Mumbai Offshore')}
-            className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
-          >
-            Mumbai Offshore (18.9°N, 72.5°E)
-          </button>
-          <button
-            type="button"
-            onClick={() => applyPreset('19.1200', '72.7500', 'Jawaharlal Nehru Port')}
-            className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
-          >
-            JNPT Anchorage (19.12°N, 72.75°E)
-          </button>
-          <button
-            type="button"
-            onClick={() => applyPreset('18.5500', '72.4000', 'Arabian Sea Shipping Lane')}
-            className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
-          >
-            Arabian Sea Lane (18.55°N, 72.40°E)
-          </button>
+        <div className="mt-4 pt-3 border-t border-slate-800/80 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-xs font-mono">
+              <span className="text-cyan-400 font-bold tracking-wider">OPERATIONAL SCENARIOS:</span>
+              <span className="text-slate-500">Select maritime theater</span>
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono">
+              {(['ALL', 'West Coast', 'East Coast', 'Strategic Chokepoints'] as const).map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setCategoryFilter(cat)}
+                  className={`px-2.5 py-1 rounded transition-colors ${
+                    categoryFilter === cat
+                      ? 'bg-cyan-950 text-cyan-400 font-bold border border-cyan-800/80'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  {cat === 'Strategic Chokepoints' ? 'Chokepoints' : cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Scenario Buttons Grid */}
+          <div className="flex flex-wrap items-center gap-2">
+            {PRESET_SCENARIOS.filter(
+              (p) => categoryFilter === 'ALL' || p.category === categoryFilter
+            ).map((preset) => {
+              const isSelected = selectedScenarioId === preset.id;
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => applyPreset(preset)}
+                  className={`group px-3 py-1.5 rounded-lg font-mono text-xs transition-all flex items-center gap-2 border ${
+                    isSelected
+                      ? 'bg-cyan-950/90 border-cyan-400 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.3)]'
+                      : 'bg-slate-800/80 hover:bg-slate-700/80 border-slate-700/80 text-slate-300'
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      isSelected ? 'bg-cyan-400 animate-pulse' : 'bg-slate-500'
+                    }`}
+                  />
+                  <span className="font-semibold">{preset.name}</span>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    {preset.lat}°N, {preset.lon}°E
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Scenario Context Info */}
+          {PRESET_SCENARIOS.find((p) => p.id === selectedScenarioId) && (
+            <div className="text-[11px] font-mono text-slate-400 flex items-center gap-2 pt-0.5">
+              <span className="text-cyan-500 font-semibold">THEATER PROFILE:</span>
+              <span className="text-slate-300">
+                {PRESET_SCENARIOS.find((p) => p.id === selectedScenarioId)?.description}
+              </span>
+            </div>
+          )}
         </div>
       </section>
 
