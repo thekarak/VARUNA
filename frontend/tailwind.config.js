@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').config} */
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -8,13 +8,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        border: "hsl(214.3 31.8% 91.4%)",
-        input: "hsl(214.3 31.8% 91.4%)",
-        ring: "hsl(215 20.2% 65.1%)",
-        cyan: "hsl(180 60% 50%)",
-        muted: "hsl(210 40% 96.1%)",
-      }
-    }
+        navy: {
+          950: "#030712",
+          900: "#060e1e",
+          850: "#0a162d",
+          800: "#0f213f",
+          700: "#18325c",
+        },
+      },
+    },
   },
-  plugins: []
-}
+  plugins: [],
+};

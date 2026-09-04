@@ -342,16 +342,17 @@ export default function ForensicDashboardPage() {
             <button
               onClick={startAnalysis}
               disabled={loading}
-              className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold font-mono text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-lg shadow-cyan-950/50 flex items-center gap-2"
+              className="px-6 py-2.5 rounded-lg bg-cyan-500 bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 hover:from-cyan-300 hover:via-teal-300 hover:to-emerald-300 text-slate-950 font-black font-mono text-xs uppercase tracking-wider transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/30 hover:shadow-cyan-400/50 hover:scale-[1.01] active:scale-[0.98] flex items-center gap-2"
             >
               {loading ? (
                 <>
                   <span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                  <span>Executing Pipeline...</span>
+                  <span className="text-slate-950 font-bold">Executing Pipeline...</span>
                 </>
               ) : (
                 <>
-                  <span>⚡ Run Forensic Pipeline</span>
+                  <span className="text-sm">⚡</span>
+                  <span className="text-slate-950 font-black tracking-wider">Run Forensic Pipeline</span>
                 </>
               )}
             </button>
@@ -359,7 +360,7 @@ export default function ForensicDashboardPage() {
             <button
               type="button"
               onClick={() => setCaseModalOpen(true)}
-              className="px-5 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-cyan-500/60 hover:border-cyan-400 text-cyan-300 font-bold font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md shadow-cyan-950/40"
+              className="px-5 py-2.5 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-cyan-500/60 hover:border-cyan-400 text-cyan-300 hover:text-cyan-200 font-bold font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md shadow-cyan-950/40 hover:shadow-cyan-500/20 active:scale-[0.98]"
             >
               <span>📄 Generate Case File (PDF)</span>
             </button>
@@ -371,19 +372,19 @@ export default function ForensicDashboardPage() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-xs font-mono">
               <span className="text-cyan-400 font-bold tracking-wider">OPERATIONAL SCENARIOS:</span>
-              <span className="text-slate-500">Select maritime theater</span>
+              <span className="text-slate-400">Select maritime theater</span>
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex flex-wrap items-center gap-1 p-0.5 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono">
+            <div className="flex flex-wrap items-center gap-1 p-1 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono">
               {(['ALL', 'India', 'Americas', 'Europe & Med', 'Middle East', 'Asia-Pacific'] as const).map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setCategoryFilter(cat)}
-                  className={`px-2.5 py-1 rounded transition-colors ${
+                  className={`px-3 py-1 rounded transition-colors ${
                     categoryFilter === cat
-                      ? 'bg-cyan-950 text-cyan-400 font-bold border border-cyan-800/80'
+                      ? 'bg-cyan-950 text-cyan-300 font-bold border border-cyan-700/80 shadow-[0_0_10px_rgba(6,182,212,0.2)]'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
@@ -404,19 +405,19 @@ export default function ForensicDashboardPage() {
                   key={preset.id}
                   type="button"
                   onClick={() => applyPreset(preset)}
-                  className={`group px-3 py-1.5 rounded-lg font-mono text-xs transition-all flex items-center gap-2 border ${
+                  className={`group px-3 py-2 rounded-lg font-mono text-xs transition-all flex items-center gap-2.5 border ${
                     isSelected
-                      ? 'bg-cyan-950/90 border-cyan-400 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.3)]'
-                      : 'bg-slate-800/80 hover:bg-slate-700/80 border-slate-700/80 text-slate-300'
+                      ? 'bg-cyan-950/90 border-cyan-400 text-cyan-200 shadow-[0_0_14px_rgba(6,182,212,0.35)] ring-1 ring-cyan-400/60'
+                      : 'bg-slate-900/80 hover:bg-slate-800 border-slate-800 hover:border-slate-700 text-slate-300 hover:text-slate-100'
                   }`}
                 >
                   <span
-                    className={`w-1.5 h-1.5 rounded-full ${
-                      isSelected ? 'bg-cyan-400 animate-pulse' : 'bg-slate-500'
+                    className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                      isSelected ? 'bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]' : 'bg-slate-600'
                     }`}
                   />
                   <span className="font-semibold">{preset.name}</span>
-                  <span className="px-1.5 py-0.2 rounded text-[9px] font-mono tracking-wider bg-slate-900/90 border border-slate-700 text-slate-400 group-hover:text-cyan-300">
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-mono tracking-wider bg-slate-950 border border-slate-800 text-cyan-400/90">
                     {preset.regionBadge}
                   </span>
                   <span className="text-[10px] text-slate-400 font-mono">

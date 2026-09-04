@@ -2,7 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --background: #030712;
+  --foreground: #f1f5f9;
+}
+
 body {
-  background: #0f172a;
-  color: #e2e8f0;
+  background: #030712;
+  color: #f1f5f9;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  overflow-x: hidden;
+}
+
+/* Custom Tactical Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #060e1e;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0284c7;
+}
+
+/* Glow Utilities */
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
+}
+.glow-cyan-sm {
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+}
+.glow-emerald-sm {
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+}
+.glow-rose-sm {
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.35);
 }
