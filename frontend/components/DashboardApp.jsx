@@ -319,9 +319,15 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
       attributionControl: false
     });
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+    const cartoKey = window.CARTO_API_KEY || "cb1_2vlt_1_8a2a2b183412e738d2fe8ff8";
+    const tileUrl = cartoKey
+      ? `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=${cartoKey}`
+      : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+
+    L.tileLayer(tileUrl, {
       subdomains: "abcd",
-      maxZoom: 19
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
     }).addTo(map);
 
     L.control.zoom({ position: "topright" }).addTo(map);
