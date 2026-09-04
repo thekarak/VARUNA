@@ -568,6 +568,9 @@ def run_varuna_forensic_pipeline(
         "slick_percentage": segmentation_results["slick_percentage"],
         "confidence_score": segmentation_results["confidence_score"],
         "estimated_volume_bbls": segmentation_results["estimated_volume_bbls"],
+        "volume_m3": segmentation_results.get("volume_m3"),
+        "metric_tonnes": segmentation_results.get("metric_tonnes"),
+        "thickness_microns": segmentation_results.get("thickness_microns"),
         "bonn_agreement_code": segmentation_results["bonn_agreement_code"],
         "polygon": segmentation_results["polygon"],
         "calculated_origin": {

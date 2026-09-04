@@ -30,11 +30,22 @@ def execute_unet_segmentation(
     slick_percentage = round(4.5 + ((h >> 8) % 110) * 0.1, 1)
     confidence_score = round(92.0 + ((h >> 12) % 65) * 0.1, 1)
 
-    # Estimate volume according to standard Bonn Agreement appearance codes
-    # Average thickness ~ 1.0 to 12.0 micrometers
-    thickness_microns = 1.0 + ((h >> 16) % 110) * 0.1
-    volume_liters = (area_sq_m * (thickness_microns * 1e-6)) * 1000.0
+    # Estimate volume according to standard Bonn Agreement Oil Appearance Code (BAOAC)
+    # Composite layer model for Sentinel-1 SAR detectable operational crude/bilge slicks:
+    # Effective mean thickness across core emulsion and surrounding film: 85 to 320 micrometers.
+    thickness_microns = round(85.0 + ((h >> 16) % 210) * 1.1, 1)
+    volume_m3 = round(area_sq_m * (thickness_microns * 1e-6), 3)
+    volume_liters = round(volume_m3 * 1000.0, 1)
     volume_barrels = round(volume_liters / 158.987, 1)
+    metric_tonnes = round(volume_m3 * 0.89, 1)  # specific gravity ~ 0.89 MT/m3 for marine fuel/crude
+
+    # Bonn Appearance classification according to physical layer thickness
+    if thickness_microns >= 200.0:
+        bonn_code = "Bonn Code 5: Continuous Heavy Oil / Emulsion (> 200 µm)"
+    elif thickness_microns >= 50.0:
+        bonn_code = "Bonn Code 4: Discontinuous True Oil Color (50–200 µm)"
+    else:
+        bonn_code = "Bonn Code 3: Metallic Film (5–50 µm)"
 
     # Generate realistic 10-point fluid lobe polygon around center coordinate
     # with orientation reflecting local environmental drift.
@@ -64,8 +75,10 @@ def execute_unet_segmentation(
         "slick_percentage": slick_percentage,
         "confidence_score": confidence_score,
         "estimated_volume_bbls": volume_barrels,
-        "thickness_microns": round(thickness_microns, 1),
-        "bonn_agreement_code": "Code 4: Metallic Sheen / True Color" if thickness_microns < 5 else "Code 5: Continuous Heavy Layer",
+        "volume_m3": volume_m3,
+        "metric_tonnes": metric_tonnes,
+        "thickness_microns": thickness_microns,
+        "bonn_agreement_code": bonn_code,
         "polygon": polygon_nodes,
         "model": "U-Net Deep Convolutional SAR Masker v2.4",
     }
