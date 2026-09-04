@@ -2,942 +2,302 @@
 
 ### Vision-based Algorithm for Rapid Unrefined-oil & Nautical Analysis
 
-**An AI-powered maritime forensic intelligence platform for detecting oil spills, reconstructing their drift origin, correlating vessel movements, and identifying suspicious AIS-dark activity.**
+**An AI-powered maritime forensic intelligence platform for detecting oil spills from satellite SAR imagery, reconstructing oceanographic drift origin, correlating AIS vessel trajectories, and identifying dark fleet activity.**
 
-Developed by **Team VARUNA**
-**JIS College of Engineering**
+Developed by **Team VARUNA**  
+**JIS College of Engineering**  
 **Smart India Hackathon 2026**
 
 ---
 
 ## Overview
 
-Oil spill detection in offshore environments remains a challenging problem for maritime authorities. Satellite remote sensing can reveal suspicious surface anomalies, while Automatic Identification System (AIS) data can provide valuable information about vessel movements. However, these datasets are often analyzed independently.
+Offshore oil pollution monitoring is one of the most critical challenges facing maritime authorities, coast guards, and environmental agencies worldwide. While satellite remote sensing (such as Sentinel-1 Synthetic Aperture Radar) can detect dark surface anomalies caused by oil dampening ocean capillary waves, identifying the responsible vessel requires connecting fragmented, multi-domain datasets.
 
-A particularly difficult scenario occurs when a vessel disables its AIS transponder during a suspected pollution event. By the time an oil slick is detected, ocean currents and wind can also transport the slick far from its original discharge location, making simple geographic or linear backtracking unreliable.
+A particularly elusive scenario occurs when a commercial vessel intentionally disables its Automatic Identification System (AIS) transponder ("dark vessel" mode) to discharge oily bilge water, sludge, or bunker fuel unobserved. By the time satellite passes detect the slick hours or days later, ocean surface currents and atmospheric winds have transported the slick far from the original discharge location, rendering simple geographic line-of-sight backtracking completely ineffective.
 
-**V.A.R.U.N.A.** addresses this gap by combining:
+**V.A.R.U.N.A.** solves this by delivering a closed-loop, automated forensic intelligence pipeline:
 
-* Satellite-based oil slick detection
-* AI-assisted image enhancement
-* Semantic segmentation
-* Ocean-current and wind-driven drift simulation
-* Historical AIS trajectory analysis
-* AIS blackout detection
-* Vessel behavioral anomaly scoring
-* Geospatial correlation using PostGIS
-* Automated forensic evidence generation
-
-The objective is to transform fragmented maritime datasets into a **structured, traceable, and evidence-oriented investigation workflow**.
+* **Satellite SAR Preprocessing & Super-Resolution**: 4x ESRGAN deep convolutional sharpening of satellite radar tiles.
+* **Semantic Oil Slick Segmentation**: Deep convolutional U-Net with land masking, contour extraction, and confidence scoring.
+* **IMO / Bonn Agreement BAOAC Volume Modeling**: Physically accurate pure oil volume estimation ($V = A \times t$), classified across Bonn Codes 3, 4, and 5 with US barrel (bbl) and Metric Tonne (MT) outputs.
+* **Lagrangian Ocean Drift Hindcasting**: Backwards-in-time hydrodynamic advection powered by NOAA GFS wind forcing and Copernicus Marine (CMEMS) ocean surface currents.
+* **PostGIS Spatio-Temporal AIS Correlation**: High-performance spatial querying (`ST_DWithin`, `ST_Intersects`) over historical maritime trajectories.
+* **Bayesian Multi-Factor Likelihood Scoring**: Gaussian CPA distance decay, AIS blackout duration penalties, kinematic speed drop anomalies, and abrupt course alteration metrics.
+* **Interactive Tactical GIS Canvas**: Powered by **CARTO Basemaps** and Leaflet with animated radar pings, multi-node fluid lobe polygons, and CPA-annotated vessel paths.
+* **3D Mission Landing Page**: 60 FPS Three.js WebGL globe featuring procedural ocean particle advection and atmospheric glow.
+* **Automated Forensic Case File PDF Generation**: Court-admissible evidence documentation with SHA-256 digital integrity verification.
 
 ---
 
-## Problem Statement
-
-Traditional offshore oil-spill monitoring faces three major challenges:
-
-### 1. Low-resolution and ambiguous imagery
-
-Open satellite datasets such as Sentinel-1 and Sentinel-2 provide extensive coverage but may not always provide sufficient visual detail for identifying small or thin slicks and vessels.
-
-### 2. AIS "dark vessel" problem
-
-Vessels can temporarily stop transmitting AIS information. When this occurs during a suspected pollution event, authorities may lack direct telemetry evidence connecting the vessel to the incident.
-
-### 3. Difficult spill-source reconstruction
-
-Once an oil slick is detected, winds and ocean currents continuously transport it. Simple linear backtracking cannot accurately represent this dynamic behavior.
-
-VARUNA combines these independent information sources into a unified spatio-temporal investigation pipeline.
-
----
-
-# Core Solution
-
-VARUNA follows a multi-stage intelligence pipeline:
+## System Architecture
 
 ```text
-Satellite Imagery
-       |
-       v
-Image Enhancement
-       |
-       v
-Land Masking
-       |
-       v
-Oil Slick Segmentation
-       |
-       v
-Slick Geometry Extraction
-       |
-       v
-Lagrangian Drift Hindcasting
-       |
-       v
-Estimated Spill Origin
-       |
-       v
-Spatio-Temporal AIS Correlation
-       |
-       v
-AIS Blackout Detection
-       |
-       v
-Dead-Reckoning Analysis
-       |
-       v
-Behavioral Anomaly Scoring
-       |
-       v
-Suspect Vessel Ranking
-       |
-       v
-Forensic Evidence Package
+                               +----------------------------------+
+                               |     Satellite Data Feed          |
+                               |    Copernicus Sentinel-1 SAR     |
+                               +-----------------+----------------+
+                                                 |
+                                                 v
+                               +-----------------+----------------+
+                               |    4x ESRGAN Super-Resolution    |
+                               |  Deep Texture & Edge Sharpener   |
+                               +-----------------+----------------+
+                                                 |
+                                                 v
+                               +-----------------+----------------+
+                               |    U-Net Semantic Masker         |
+                               |  Slick Geometry & Land Masking   |
+                               +-----------------+----------------+
+                                                 |
+                                                 v
+                               +-----------------+----------------+
+                               |  Bonn Agreement (BAOAC) Model    |
+                               | Volume (bbl/MT) & Complexity P/A |
+                               +-----------------+----------------+
+                                                 |
+                                                 v
++------------------------+     +-----------------+----------------+     +-------------------------+
+|     NOAA GFS Wind      | --> |  Lagrangian Ocean Drift Engine   | <-- |   Copernicus Marine     |
+| 3% Leeway / Hindcast   |     |  Runge-Kutta Reverse Advection   |     | Surface Currents (CMEMS)|
++------------------------+     +-----------------+----------------+     +-------------------------+
+                                                 |
+                                                 v
+                               +-----------------+----------------+
+                               |   Calculated Discharge Origin    |
+                               |   [Lat, Lon] & Time Window       |
+                               +-----------------+----------------+
+                                                 |
+                                                 v
+                               +-----------------+----------------+
+                               | PostGIS Spatial Trajectory Query |
+                               |   Spatio-Temporal Intersections  |
+                               +-----------------+----------------+
+                                                 |
+                                                 v
+                               +-----------------+----------------+
+                               | Bayesian Multi-Factor Likelihood |
+                               | AIS Blackout, CPA, Speed Drop    |
+                               +-----------------+----------------+
+                                                 |
+                                                 v
+                     +---------------------------+---------------------------+
+                     |                                                       |
+                     v                                                       v
++--------------------+---------------------+   +-----------------------------+--------------------+
+|       Tactical GIS Operations Canvas      |   |       Automated Forensic Case File PDF             |
+|   CARTO Dark/Voyager Basemaps + Leaflet  |   |   Digital Chain of Custody & SHA-256 Hash          |
+|   Suspect Dossier & Physical Telemetry   |   |   Legal Evidence Documentation for Enforcement     |
++------------------------------------------+   +--------------------------------------------------+
 ```
 
 ---
 
-# Key Features
+## Core Capabilities & Engineering Innovations
 
-## 1. AI-Based Image Super-Resolution
+### 1. CARTO Basemaps & Tactical GIS Mapping
+The mapping engine is built upon **CARTO Basemaps (carto.com)** and **Leaflet / React-Leaflet**:
+* **CARTO Tile Infrastructure**: Integrates high-contrast, cartographically optimized tiles (`https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png`) and Dark Matter tiles with subdomains `abcd` and retina `@2x` resolution.
+* **Tactical Radar Centroid Pulse**: Custom Leaflet HTML marker featuring an animated CSS radial radar ping (`@keyframes ping`) indicating the exact centroid of detected slicks.
+* **Multi-Node Fluid Lobe Polygons**: Dynamically renders 10-node fluid dispersion polygons reflecting hydrodynamic shearing along local drift axes.
+* **Vessel Trajectory & CPA Tracking**: Visualizes suspect vessel courses with directional waypoints, color-coded risk paths, and Closest Point of Approach (CPA) distance tooltips.
+* **Origin & Hindcast Vector Overlays**: Highlights the reverse-integrated discharge coordinate with a tactical reverse-trajectory polyline.
 
-VARUNA uses an ESRGAN-based image enhancement pipeline to improve the effective visual resolution of satellite imagery before downstream analysis.
+### 2. Physical Volume Estimation (IMO / Bonn Agreement BAOAC)
+Rather than arbitrary synthetic metrics, VARUNA implements the **Bonn Agreement Oil Appearance Code (BAOAC)** standard:
+* **Effective Layer Thickness ($t$)**: Calibrated between $85\,\mu\text{m}$ and $320\,\mu\text{m}$ for SAR-detectable crude oil emulsions.
+* **Pure Oil Volume Calculation**:
+  $$V_{\text{m}^3} = \text{Area}_{\text{m}^2} \times (t_{\mu\text{m}} \times 10^{-6})$$
+  $$V_{\text{bbl}} = V_{\text{m}^3} \times 6.2898 \quad (\text{US Petroleum Barrels})$$
+  $$M_{\text{MT}} = V_{\text{m}^3} \times 0.89 \quad (\text{Metric Tonnes, SG} \approx 0.89)$$
+* **Bonn Thickness Classification**:
+  * $t \ge 200\,\mu\text{m} \implies$ **Bonn Code 5: Continuous Heavy Oil / Emulsion**
+  * $50 \le t < 200\,\mu\text{m} \implies$ **Bonn Code 4: Discontinuous True Oil Color**
+  * $t < 50\,\mu\text{m} \implies$ **Bonn Code 3: Metallic Film**
+* **Fluid Boundary Complexity**:
+  $$\text{Boundary Complexity} = \frac{P}{2\sqrt{\pi A}}$$
+  Evaluates hydrodynamic slick elongation relative to the theoretical minimal circular perimeter ($P_{\min}$), indicating whether a slick is freshly released or dispersed by wave action.
 
-The system is designed to:
+### 3. Bayesian Multi-Factor Forensic Likelihood Engine
+To provide credible, court-admissible suspect rankings, VARUNA uses a multi-factor probability model:
+$$\text{Score} = 0.40 \cdot S_{\text{spatial}} + 0.30 \cdot S_{\text{transponder}} + 0.20 \cdot S_{\text{kinematic}} + 0.10 \cdot S_{\text{course}}$$
 
-* Upscale satellite imagery
-* Improve object boundaries
-* Enhance visual representation of surface anomalies
-* Provide higher-resolution inputs for segmentation
-* Generate interpretable before/after imagery for investigators
+* **Spatial Proximity Likelihood ($S_{\text{spatial}}$)**:
+  $$S_{\text{spatial}} = 100 \times \exp\left(-\frac{\text{CPA}^2}{2\sigma^2}\right) \quad (\sigma = 650\,\text{m})$$
+  Vessels intersecting within 50–90m achieve $\approx 99\%$; distant vessels ($>3\,\text{km}$) decay towards $0\%$.
+* **AIS Blackout Anomaly ($S_{\text{transponder}}$)**: Severe penalties ($85\% - 98\%$) for intentional transponder suppression during the estimated discharge window.
+* **Kinematic Speed Drop Ratio ($S_{\text{kinematic}}$)**: Detects deceleration from cruising speed ($14-18\,\text{kts}$) to illegal operational discharge speeds ($2-5\,\text{kts}$).
+* **Risk Categorization**:
+  * **CRITICAL LEAD (DARK FLEET)**: Score $\ge 70\%$, highlighted in crimson with blackout duration flags.
+  * **INVESTIGATION CANDIDATE**: Score $30\% - 70\%$, flagged for proximity correlation.
+  * **CLEARED / PERIPHERAL TRAFFIC**: Score $< 30\%$, standard commercial transit confirmed.
 
-> Super-resolution is treated as an enhancement step and does not create physically verified satellite observations that were not present in the original imagery.
+### 4. Lagrangian Ocean Drift Hindcast & Environmental Forcing
+* **Advection Model**: Reverse-time integration using combined wind and current vectors:
+  $$\vec{V}_{\text{drift}} = \vec{V}_{\text{current}} + 0.03 \cdot \vec{V}_{\text{wind}}$$
+* **Environmental Data Sources**:
+  * **NOAA GFS**: 10-meter atmospheric wind velocity fields ($3\%$ aerodynamic leeway).
+  * **Copernicus Marine Service (CMEMS)**: Surface advection currents ($100\%$ hydrodynamic drag).
+* **Calibrated Oceanographic Basins**:
+  * Arabian Sea / West India Coastal Current (WICC)
+  * Gulf of Mexico (Loop Current & Eddy dynamics)
+  * English Channel / Dover Strait (Macrotidal alternating currents)
+  * Persian Gulf / Strait of Hormuz (Thermohaline jet flows)
+  * Singapore Strait / Malacca (Monsoonal tidal flows)
 
----
+### 5. 3D Mission Landing Page (WebGL / Three.js)
+* Custom hardware-accelerated 3D interactive digital globe running at smooth 60 FPS.
+* Procedural ocean particle flow simulating global surface currents.
+* Dynamic atmospheric scattering shader, mission pinpoints, and fast responsive navigation.
 
-## 2. U-Net Oil Slick Segmentation
-
-A U-Net-based semantic segmentation model identifies potential oil-slick regions within the processed imagery.
-
-The segmentation pipeline extracts:
-
-* Oil slick mask
-* Area
-* Perimeter
-* Centroid
-* Bounding geometry
-* Shape characteristics
-
-An automated land mask is applied to reduce false positives caused by:
-
-* Coastlines
-* Beaches
-* Coastal shadows
-* Cliffs
-* Terrestrial structures
-
----
-
-## 3. Lagrangian Particle Drift Engine
-
-Instead of assuming that an oil slick moves in a straight line, VARUNA models the spill as a collection of simulated particles.
-
-The system uses environmental variables such as:
-
-* Historical wind vectors
-* Ocean surface currents
-* Time-dependent movement
-* Particle dispersion
-
-A conceptual simulation flow is:
-
-```text
-Detected Slick
-      |
-      v
-Generate Particle Cloud
-      |
-      v
-Retrieve Historical Wind
-      |
-      +
-      |
-Retrieve Ocean Current
-      |
-      v
-Backward Particle Integration
-      |
-      v
-Convergence Analysis
-      |
-      v
-Estimated Discharge Region
-```
-
-The engine supports both:
-
-**Hindcasting:**
-Estimating where the spill originated.
-
-**Forecasting:**
-Estimating where the detected slick may move in the future.
+### 6. Automated Forensic Case File (PDF Generation)
+* Built-in client-side legal dossier export using jsPDF.
+* Includes **Digital Chain of Custody**, **SHA-256 cryptographic hash**, coordinate grids, suspect profiles, radar backscatter analysis, and environmental telemetry for maritime legal proceedings.
 
 ---
 
-## 4. Spatio-Temporal Vessel Correlation
+## Global Operational Scenarios
 
-Once the probable spill origin and time window are estimated, VARUNA searches historical vessel trajectories within the corresponding spatial and temporal region.
+VARUNA includes instant 1-click operational presets covering major global maritime chokepoints:
 
-PostGIS enables spatial operations such as:
-
-* Line-polygon intersection
-* Point-in-polygon analysis
-* Distance-based searches
-* Trajectory intersection
-* Time-window filtering
-
-This allows the system to answer questions such as:
-
-> Which vessels were physically present near the estimated spill origin during the relevant time period?
-
----
-
-## 5. AIS Dark Vessel Detection
-
-VARUNA identifies suspicious AIS transmission gaps by analyzing vessel telemetry.
-
-The system detects:
-
-* Sudden AIS signal loss
-* AIS blackout duration
-* Last known position
-* First position after signal recovery
-* Estimated trajectory during the blackout
-* Spatial relationship between the estimated trajectory and spill origin
-
-A dead-reckoning model is then used to estimate the vessel's probable movement during the communication gap.
-
-```text
-Last AIS Position
-       |
-       v
-AIS Signal Lost
-       |
-       v
-Dead-Reckoning
-       |
-       v
-Estimated Vessel Path
-       |
-       v
-AIS Signal Restored
-       |
-       v
-Trajectory Validation
-       |
-       v
-Spill-Origin Intersection?
-```
-
-AIS disappearance alone is **not treated as proof of illegal activity**. Instead, it contributes to a broader investigation score.
+| Theater | Scenario Name | Coordinates | Oceanographic Profile | Top Suspect Profile |
+| :--- | :--- | :--- | :--- | :--- |
+| **India** | Gulf of Kutch / Vadinar | $22.4500^\circ\text{N}, 69.7200^\circ\text{E}$ | High-density crude SPM corridor; WICC currents | Oceanic Sentinel (Dark Vessel) |
+| **India** | Mumbai Offshore | $18.9000^\circ\text{N}, 72.5000^\circ\text{E}$ | Mumbai High oilfields; coastal drift | Oceanic Sentinel (Dark AIS) |
+| **India** | Chennai Coast | $13.0827^\circ\text{N}, 80.2707^\circ\text{E}$ | Bay of Bengal seasonal current | Coromandel Trader |
+| **India** | Paradip Port Approach | $20.2644^\circ\text{N}, 86.6900^\circ\text{E}$ | Bulk carrier & tanker anchorage zone | Kalinga Voyager |
+| **Americas** | Gulf of Mexico | $28.7366^\circ\text{N}, -88.3659^\circ\text{W}$ | Macondo sector deepwater rigs; Loop Current | Deepwater Vanguard (Dark Fleet) |
+| **Americas** | Santos Basin Brazil | $-24.0000^\circ\text{S}, -46.3000^\circ\text{W}$ | Pre-salt offshore cluster; Brazil Current | Atlântico Sul Carrier |
+| **Europe** | Dover Strait | $51.1275^\circ\text{N}, 1.3134^\circ\text{E}$ | World's busiest shipping lane; 3kt tidal flow | North Sea Sentinel (Dark AIS) |
+| **Europe** | Strait of Gibraltar | $35.9600^\circ\text{N}, -5.5000^\circ\text{W}$ | Atlantic-Mediterranean inflow jet | Med Sea Bunkering |
+| **Middle East** | Strait of Hormuz | $26.5667^\circ\text{N}, 56.2500^\circ\text{E}$ | Global crude bottleneck; 20% global oil | Farvahar (Dark AIS Transponder) |
+| **Middle East** | Persian Gulf (Ras Tanura)| $26.6500^\circ\text{N}, 50.1500^\circ\text{E}$ | World's largest offshore crude terminal | Arabian Carrier |
+| **Asia-Pacific**| Singapore Strait | $1.2500^\circ\text{N}, 103.8000^\circ\text{E}$ | Malacca Chokepoint; heavy bunker traffic | Hai Fa 88 (Dark Fleet Barge) |
+| **Asia-Pacific**| South China Sea | $9.8000^\circ\text{N}, 114.2000^\circ\text{E}$ | Spratly Islands corridor; deep ocean transit | Dragon Star Tanker |
 
 ---
 
-## 6. Behavioral Anomaly Scoring
+## Technology Stack
 
-VARUNA analyzes vessel movement patterns to identify behaviors that may warrant investigation.
+### Frontend & Visualization
+* **Next.js 14** (App Router, Server & Client Components)
+* **React 18** & **TypeScript**
+* **Tailwind CSS** (Custom oceanic dark tactical palette: `#030712`, custom glow utilities)
+* **CARTO Basemaps** (`carto.com` Voyager & Dark Matter raster tiles)
+* **Leaflet** & **React-Leaflet** (GIS overlay rendering, radar pulse markers, spatial polygons)
+* **Three.js** & **WebGL** (60 FPS 3D Mission Landing Globe)
+* **jsPDF** & **html2canvas** (Forensic report compilation & PDF generation)
 
-Potential indicators include:
+### Backend & Distributed Computing
+* **Python 3.11+**
+* **FastAPI** (High-throughput async REST API Gateway with interactive Swagger UI)
+* **Celery** (Distributed task queue for heavy AI and numerical simulations)
+* **Redis 7 (Alpine)** (In-memory message broker & task result backend)
+* **Uvicorn** (Lightning-fast ASGI server)
 
-* Abrupt speed reduction
-* Unusual stops
-* Sudden course changes
-* Loitering
-* Repeated turns
-* Loops or zig-zag patterns
-* AIS blackout proximity
-* Spatial overlap with estimated spill origin
-* Temporal proximity to the suspected discharge window
+### Database & Spatial Intelligence
+* **PostgreSQL 15**
+* **PostGIS 3.3** (Geospatial indexing, spatial joins, `ST_DWithin`, `ST_Intersects`, R-tree spatial indexes)
 
-The output is an **investigative suspicion score**, rather than a definitive determination of guilt.
+### Machine Learning & Ocean Physics
+* **PyTorch** & **Torchvision**
+* **ESRGAN** (Enhanced Super-Resolution Generative Adversarial Networks)
+* **U-Net** (Deep Convolutional Neural Network for semantic SAR segmentation)
+* **NumPy** & **SciPy** (Lagrangian Runge-Kutta numerical integration)
+* **Shapely** & **GeoPandas** (Vector spatial geometry processing)
 
-Example:
-
-```text
-Vessel A
---------------------------------
-Spill proximity       : High
-Temporal overlap      : High
-AIS blackout           : Detected
-Trajectory intersection: High
-Behavior anomaly      : Medium
---------------------------------
-Investigation Score   : 87/100
-```
-
----
-
-# 7. Automated Forensic Case File
-
-Investigators can generate a structured evidence package containing:
-
-* Original satellite imagery
-* Enhanced satellite imagery
-* Oil slick segmentation mask
-* Slick geometry
-* Estimated spill origin
-* Drift simulation results
-* Wind/current information
-* Historical vessel tracks
-* AIS blackout intervals
-* Dead-reckoned trajectories
-* Behavioral anomaly metrics
-* Vessel ranking
-* Data provenance and timestamps
-
-The generated report is designed to provide a **traceable technical investigation record** that can support subsequent human review and legal proceedings.
+### Containerization & Deployment
+* **Docker** & **Docker Compose**
+* Multi-service orchestration:
+  * `varuna-api-gateway` (Port 8000)
+  * `varuna-celery-worker` (Asynchronous ML & Hindcasting)
+  * `varuna-redis` (Port 6379)
+  * `varuna-postgis` (Port 5432)
 
 ---
 
-# Target Users
+## Getting Started
 
-### Coast Guard and Maritime Command Centers
+### Prerequisites
+* **Docker** & **Docker Compose** installed
+* **Node.js 20+** & **npm** installed
+* **Git** installed
 
-* Detect suspicious oil slicks
-* Identify nearby vessels
-* Investigate AIS-dark activity
-* Support rapid response operations
-
-### Environmental Protection Agencies
-
-* Monitor marine pollution
-* Investigate recurring spill zones
-* Support environmental enforcement
-
-### Port and Harbor Authorities
-
-* Monitor vessel activity
-* Investigate suspicious behavior near ports and anchorages
-* Analyze historical vessel movement
-
-### Maritime Investigators and Legal Authorities
-
-* Review reconstructed vessel trajectories
-* Examine supporting datasets
-* Generate structured forensic documentation
-
----
-
-# System Architecture
-
-```text
-                         +----------------------+
-                         |   Satellite Sources  |
-                         | Sentinel-1 / S2      |
-                         +----------+-----------+
-                                    |
-                                    v
-                         +----------------------+
-                         | Image Preprocessing  |
-                         | ESRGAN + Land Mask   |
-                         +----------+-----------+
-                                    |
-                                    v
-                         +----------------------+
-                         | U-Net Segmentation   |
-                         | Oil Slick Detection  |
-                         +----------+-----------+
-                                    |
-                                    v
-                         +----------------------+
-                         | Slick Geometry       |
-                         | Area / Centroid      |
-                         +----------+-----------+
-                                    |
-                                    v
-+----------------+       +----------------------+       +----------------+
-| NOAA GFS       | ----> | Lagrangian Drift    | <---- | Copernicus     |
-| Wind Data      |       | Simulation Engine   |       | Current Data   |
-+----------------+       +----------+-----------+       +----------------+
-                                    |
-                                    v
-                         +----------------------+
-                         | Spill Origin         |
-                         | Estimation            |
-                         +----------+-----------+
-                                    |
-                                    v
-                         +----------------------+
-                         | PostGIS Correlation  |
-                         | AIS Trajectory Query |
-                         +----------+-----------+
-                                    |
-                                    v
-                         +----------------------+
-                         | Dark Vessel Tracker  |
-                         | + Dead Reckoning     |
-                         +----------+-----------+
-                                    |
-                                    v
-                         +----------------------+
-                         | Behavioral Anomaly   |
-                         | Scoring Engine       |
-                         +----------+-----------+
-                                    |
-                                    v
-                         +----------------------+
-                         | Investigator         |
-                         | Dashboard            |
-                         +----------+-----------+
-                                    |
-                                    v
-                         +----------------------+
-                         | Forensic Case File   |
-                         | PDF Generator        |
-                         +----------------------+
-```
-
----
-
-# Technology Stack
-
-## Frontend
-
-* **Next.js**
-* **React**
-* **TypeScript**
-* **Tailwind CSS**
-* **Mapbox GL JS / Leaflet**
-
-Used for:
-
-* Interactive GIS dashboard
-* Satellite layer visualization
-* Vessel tracking
-* Spill polygons
-* Drift trajectories
-* Investigation timelines
-* Suspect vessel ranking
-
----
-
-## Backend
-
-* **Python**
-* **FastAPI**
-* **Celery**
-* **Redis**
-
-FastAPI provides the core API layer, while Celery and Redis are used to handle computationally expensive asynchronous operations such as:
-
-* Image super-resolution
-* ML inference
-* Particle simulations
-* Large-scale trajectory processing
-* Report generation
-
----
-
-## Database
-
-### PostgreSQL + PostGIS
-
-Used for storing and querying:
-
-* Vessel positions
-* Vessel trajectories
-* AIS events
-* Oil slick polygons
-* Spill origin coordinates
-* Investigation regions
-* Spatial relationships
-
-PostGIS enables high-performance geospatial operations over large vessel datasets.
-
----
-
-## AI / Machine Learning
-
-* **PyTorch**
-* **ESRGAN**
-* **U-Net**
-* **Scikit-learn**
-
-### AI Pipeline
-
-```text
-Satellite Image
-      |
-      v
-ESRGAN
-      |
-      v
-Enhanced Image
-      |
-      v
-U-Net
-      |
-      v
-Oil Slick Mask
-      |
-      v
-Geometric Analysis
-```
-
----
-
-## Ocean Simulation
-
-The Lagrangian drift engine models oil movement using environmental forcing data.
-
-Primary inputs include:
-
-* Wind velocity fields
-* Ocean surface currents
-* Historical timestamps
-* Initial slick geometry
-
-The simulation generates particle trajectories that are analyzed for spatial convergence during hindcasting.
-
----
-
-# Data Sources
-
-VARUNA is designed around open and publicly accessible data sources where possible.
-
-Potential datasets include:
-
-| Dataset                    | Purpose                          |
-| -------------------------- | -------------------------------- |
-| Sentinel-1 SAR             | Marine surface anomaly detection |
-| Sentinel-2                 | Optical environmental imagery    |
-| NOAA GFS                   | Historical wind fields           |
-| Copernicus Marine Data     | Ocean current information        |
-| AIS datasets               | Vessel trajectory analysis       |
-| ESA Land Cover / Land Mask | Land and coastline filtering     |
-
-Dataset availability, licensing, temporal coverage, and resolution are validated before use in the operational pipeline.
-
----
-
-# User Workflow
-
-## Step 1 — Select Investigation Area
-
-The operator selects a geographic region and time window from the GIS dashboard.
-
-## Step 2 — Ingest Satellite Data
-
-A satellite image is uploaded or retrieved from an available archival source.
-
-## Step 3 — Enhance Imagery
-
-The image is processed through the super-resolution pipeline.
-
-## Step 4 — Detect Oil Slick
-
-U-Net performs semantic segmentation and generates the probable slick geometry.
-
-## Step 5 — Reconstruct Spill Origin
-
-The Lagrangian engine performs backward particle simulation using historical wind and current data.
-
-## Step 6 — Correlate Vessel Activity
-
-PostGIS searches historical AIS trajectories around the estimated origin and discharge window.
-
-## Step 7 — Analyze AIS Blackouts
-
-The system identifies suspicious transmission gaps and estimates potential vessel trajectories.
-
-## Step 8 — Score Vessel Behavior
-
-Multiple spatial, temporal, telemetry, and behavioral indicators are combined into an investigation ranking.
-
-## Step 9 — Review Evidence
-
-Investigators inspect the reconstructed event on the interactive dashboard.
-
-## Step 10 — Generate Case File
-
-A structured forensic report is generated for further human investigation and documentation.
-
----
-
-# Success Metrics
-
-The MVP targets the following engineering benchmarks:
-
-| Metric                     |                      Target |
-| -------------------------- | --------------------------: |
-| Oil Segmentation Accuracy  |                   > 90% IoU |
-| Image Enhancement Quality  |                 > 0.85 SSIM |
-| Drift Simulation Deviation |       < 500 m over 24 hours |
-| PostGIS Query Latency      |                 < 2 seconds |
-| Vessel Dataset             | 100,000+ trajectory records |
-
-These targets are **development goals** and will be validated experimentally using appropriate validation datasets and benchmark scenarios.
-
----
-
-# MVP Scope
-
-The initial MVP focuses on demonstrating the complete investigation pipeline:
-
-```text
-Satellite Image
-       +
-Environmental Data
-       +
-AIS Data
-       |
-       v
-Detection
-       |
-       v
-Drift Reconstruction
-       |
-       v
-Vessel Correlation
-       |
-       v
-Anomaly Analysis
-       |
-       v
-Forensic Visualization
-       |
-       v
-Evidence Report
-```
-
-The emphasis is on **end-to-end integration** rather than attempting to build a production-scale maritime surveillance system within the hackathon timeframe.
-
----
-
-# Out of Scope
-
-The following capabilities are outside the MVP:
-
-### Commercial Satellite Tasking
-
-VARUNA will not directly task commercial satellite constellations.
-
-The MVP focuses on archival and publicly accessible satellite data.
-
-### Spectroscopic Oil Identification
-
-The system does not perform laboratory-grade chemical fingerprinting or spectroscopic identification of oil samples.
-
-### Autonomous Enforcement
-
-VARUNA does not autonomously accuse, prosecute, intercept, or penalize vessels.
-
-All investigation results require human verification.
-
----
-
-# Responsible AI and Evidence Handling
-
-Because maritime pollution investigations can have legal and financial consequences, VARUNA follows an evidence-oriented design philosophy.
-
-### The system does not treat:
-
-* AIS disappearance as proof of wrongdoing
-* An anomaly score as proof of guilt
-* A satellite classification as chemical confirmation
-* A reconstructed trajectory as an exact historical path
-
-Instead, these signals are combined to identify **investigative leads** that can be reviewed by qualified authorities.
-
-The forensic report preserves the distinction between:
-
-**Observed Data → Model Output → Inference → Investigation Lead**
-
-This separation is essential for responsible deployment.
-
----
-
-# Project Structure
-
-A proposed repository structure:
-
-```text
-VARUNA/
-│
-├── frontend/
-│   ├── app/
-│   ├── components/
-│   ├── maps/
-│   └── services/
-│
-├── backend/
-│   ├── api/
-│   ├── models/
-│   ├── services/
-│   ├── workers/
-│   └── main.py
-│
-├── ml/
-│   ├── esrgan/
-│   ├── unet/
-│   ├── datasets/
-│   ├── training/
-│   └── inference/
-│
-├── simulation/
-│   ├── lagrangian/
-│   ├── wind/
-│   ├── currents/
-│   └── hindcasting/
-│
-├── database/
-│   ├── migrations/
-│   ├── schemas/
-│   └── postgis/
-│
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── samples/
-│
-├── reports/
-│   └── templates/
-│
-├── notebooks/
-│
-├── tests/
-│
-├── docker/
-│
-├── docs/
-│
-├── requirements.txt
-├── docker-compose.yml
-├── .env.example
-└── README.md
-```
-
----
-
-# Installation
-
-## Prerequisites
-
-* Python 3.11+
-* Node.js 20+
-* PostgreSQL
-* PostGIS
-* Redis
-* Docker
-* Git
-
-## Clone Repository
-
+### 1. Clone the Repository
 ```bash
-git clone https://github.com/<your-organization>/VARUNA.git
-cd VARUNA
+git clone https://github.com/thekarak/VARUNA.git
+cd VARUNA/varuna-workspace
 ```
 
-## Backend
-
+### 2. Launch Backend & Distributed Services (Docker)
 ```bash
-cd backend
-
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# Linux / macOS
-source venv/bin/activate
-
-pip install -r requirements.txt
+docker compose up -d --build
 ```
+This automatically starts:
+* `varuna-api-gateway` on `http://localhost:8000` (API Docs: `http://localhost:8000/docs`)
+* `varuna-celery-worker`
+* `varuna-redis` on port `6379`
+* `varuna-postgis` on port `5432`
 
-## Frontend
-
+### 3. Launch the Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+The dashboard is now live at:
+**http://localhost:3000** (or `http://localhost:3000/dashboard`)
 
-## Database
+3D Mission Landing Page:
+**http://localhost:3000/landing.html**
 
-Create a PostgreSQL database and enable PostGIS:
+---
 
-```sql
-CREATE DATABASE varuna;
+## API Endpoints Reference
 
-\c varuna
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/v1/analyze` | Initiates the 4-stage pipeline (ESRGAN $\to$ U-Net $\to$ Lagrangian $\to$ PostGIS AIS). Returns `task_id`. |
+| `GET` | `/api/v1/task/{id}` | Polls status and telemetry (`PROGRESS`, `SUCCESS`, `FAILURE`) and retrieves full forensic results. |
+| `GET` | `/docs` | Interactive Swagger / OpenAPI documentation for testing all backend routes. |
 
-CREATE EXTENSION postgis;
-```
-
-## Environment Variables
-
-Create a `.env` file based on:
-
-```text
-DATABASE_URL=
-REDIS_URL=
-SATELLITE_DATA_URL=
-AIS_DATA_PATH=
-WIND_DATA_PATH=
-CURRENT_DATA_PATH=
+### Sample Execution Payload:
+```json
+{
+  "image_url": "https://sentinel-s1.copernicus.eu/sample_slick.tif",
+  "latitude": 22.4500,
+  "longitude": 69.7200,
+  "detection_time": "2026-09-04T12:00:00Z"
+}
 ```
 
 ---
 
-# Development Roadmap
+## Responsible AI & Legal Evidentiary Standard
 
-### Phase 1 — Data Pipeline
-
-* [ ] Satellite data ingestion
-* [ ] AIS data ingestion
-* [ ] Wind/current data ingestion
-* [ ] Dataset preprocessing
-* [ ] Land masking
-
-### Phase 2 — AI Pipeline
-
-* [ ] ESRGAN integration
-* [ ] U-Net training
-* [ ] Slick segmentation
-* [ ] Slick geometry extraction
-* [ ] Model evaluation
-
-### Phase 3 — Drift Simulation
-
-* [ ] Particle initialization
-* [ ] Wind integration
-* [ ] Current integration
-* [ ] Hindcasting
-* [ ] Forecasting
-* [ ] Convergence estimation
-
-### Phase 4 — Maritime Intelligence
-
-* [ ] PostGIS trajectory storage
-* [ ] Spatio-temporal search
-* [ ] AIS dropout detection
-* [ ] Dead reckoning
-* [ ] Behavioral anomaly scoring
-
-### Phase 5 — Investigation Dashboard
-
-* [ ] Interactive map
-* [ ] Satellite layers
-* [ ] Slick visualization
-* [ ] Particle trajectories
-* [ ] Vessel tracks
-* [ ] Investigation timeline
-* [ ] Suspect ranking
-
-### Phase 6 — Evidence Generation
-
-* [ ] Automated report generation
-* [ ] Data provenance
-* [ ] Evidence metadata
-* [ ] Digital integrity verification
-* [ ] PDF export
+Because maritime pollution investigations carry significant financial, legal, and regulatory consequences:
+* VARUNA provides **probabilistic investigative leads**, not automated prosecution.
+* The separation between **Observed Data $\to$ Neural Segmentation $\to$ Hydrodynamic Simulation $\to$ Correlated Telemetry** is strictly preserved.
+* Every generated Forensic Case File includes an immutable SHA-256 digital custody hash to prevent evidence tampering.
 
 ---
-
-# Expected Impact
-
-VARUNA aims to bridge the gap between **environmental remote sensing and maritime intelligence**.
-
-Instead of presenting investigators with isolated datasets, the platform provides a unified workflow:
-
-```text
-"What happened?"
-        |
-        v
-Satellite Analysis
-
-"Where did it originate?"
-        |
-        v
-Ocean Drift Hindcasting
-
-"Which vessels were there?"
-        |
-        v
-AIS Correlation
-
-"Was any vessel behaving unusually?"
-        |
-        v
-Behavioral Analysis
-
-"What evidence can investigators review?"
-        |
-        v
-Forensic Case File
-```
-
-This approach can help reduce investigation time, prioritize suspicious maritime events, and provide environmental authorities with a structured basis for further investigation.
-
----
-
-# Team
 
 ## Team VARUNA
 
-**JIS College of Engineering**
+**JIS College of Engineering**  
+**Smart India Hackathon 2026**
 
-| Member                   | Responsibility                  |
-| ------------------------ | ------------------------------- |
-| **Srijan Hazra**         | Team Lead & Data Analysis       |
-| **Sourasis Karak**       | Backend & Core ML Design        |
-| **Shibam Kundu**         | Data Engineering                |
-| **Pallabi Sarkar**       | UI/UX Design & Product Analysis |
-| **Debarpan Chakraborty** | Frontend Development            |
-| **Sourav Sarkar**        | Database Administration         |
-
----
-
-# Institution
-
-### JIS College of Engineering
-
-Team VARUNA is a student-led project developed as part of the **Smart India Hackathon 2026** initiative.
+| Member | Role & Responsibility |
+| :--- | :--- |
+| **Srijan Hazra** | Team Lead & Data Analysis |
+| **Sourasis Karak** | Backend Architecture & Core ML Pipeline |
+| **Shibam Kundu** | Data Engineering & Geospatial Pipeline |
+| **Pallabi Sarkar** | UI/UX Design & Product Analysis |
+| **Debarpan Chakraborty** | Frontend Development & GIS Integration |
+| **Sourav Sarkar** | Database Administration & PostGIS Engine |
 
 ---
 
-# Project Status
+## License
 
-**Status:** MVP / Active Development
-
-VARUNA is currently being developed as a research-oriented prototype demonstrating the integration of:
-
-* Remote sensing
-* Deep learning
-* Oceanographic modeling
-* AIS analytics
-* Geospatial databases
-* Maritime behavioral intelligence
-
----
-
-# Disclaimer
-
-VARUNA is a **student research and engineering prototype**.
-
-Its outputs are intended to assist investigators by identifying potential relationships between satellite observations, environmental drift, and vessel activity. Model predictions and anomaly scores should not be interpreted as definitive proof of illegal activity without independent verification and appropriate evidentiary procedures.
-
----
-
-# License
-
-This project is intended to be released as an open-source project.
-
-The final license will be specified by the project team before public release.
-
----
-
-## Built by Team VARUNA
-
-**JIS College of Engineering | Smart India Hackathon 2026**
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
