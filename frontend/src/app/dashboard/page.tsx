@@ -9,63 +9,70 @@ import { ForensicCaseFileModal } from '../../components/ForensicCaseFileModal';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
+export type ScenarioCategory = 'ALL' | 'India' | 'Americas' | 'Europe & Med' | 'Middle East' | 'Asia-Pacific';
+
 export interface PresetScenario {
   id: string;
   name: string;
-  category: 'West Coast' | 'East Coast' | 'Strategic Chokepoints';
+  category: 'India' | 'Americas' | 'Europe & Med' | 'Middle East' | 'Asia-Pacific';
+  regionBadge: string;
   lat: string;
   lon: string;
   description: string;
 }
 
 export const PRESET_SCENARIOS: PresetScenario[] = [
-  // West Coast
+  // --- INDIA THEATER ---
   {
     id: 'mumbai-offshore',
     name: 'Mumbai Offshore',
-    category: 'West Coast',
+    category: 'India',
+    regionBadge: 'ARABIAN SEA',
     lat: '18.9000',
     lon: '72.5000',
-    description: 'High-density commercial shipping channel off Mumbai Harbor.',
+    description: 'High-density commercial shipping channel off Mumbai Harbor and refinery roadsteads.',
   },
   {
     id: 'mumbai-high',
     name: 'Mumbai High Oilfields',
-    category: 'West Coast',
+    category: 'India',
+    regionBadge: 'OFFSHORE PLATFORMS',
     lat: '19.4200',
     lon: '71.3100',
-    description: 'Offshore crude extraction platforms & undersea pipeline corridor.',
+    description: 'Offshore crude extraction platform complex and undersea pipeline network.',
   },
   {
     id: 'gulf-kutch',
     name: 'Gulf of Kutch (Vadinar)',
-    category: 'West Coast',
+    category: 'India',
+    regionBadge: 'CRUDE IMPORT HUB',
     lat: '22.4500',
     lon: '69.7200',
-    description: 'Primary crude oil import hub with sensitive marine national biosphere.',
+    description: 'India\'s primary crude oil discharge terminal with sensitive mangrove marine national biosphere.',
   },
   {
     id: 'jnpt-anchorage',
     name: 'JNPT Port Anchorage',
-    category: 'West Coast',
+    category: 'India',
+    regionBadge: 'INNER ROADSTEAD',
     lat: '19.1200',
     lon: '72.7500',
-    description: 'Major container roadstead anchorage with congested traffic.',
+    description: 'Major container roadstead anchorage with congested multi-vessel traffic.',
   },
   {
     id: 'cochin-lane',
     name: 'Cochin / Lakshadweep Sea',
-    category: 'West Coast',
+    category: 'India',
+    regionBadge: 'SOUTH FAIRWAY',
     lat: '9.9600',
     lon: '76.2200',
-    description: 'Southern tanker channel connecting Middle East and East Asia.',
+    description: 'Southern tanker channel connecting Middle East crude to Southeast Asia.',
   },
-
-  // East Coast & Bay of Bengal
   {
     id: 'vizag-outer',
     name: 'Visakhapatnam Roads',
-    category: 'East Coast',
+    category: 'India',
+    regionBadge: 'BAY OF BENGAL',
     lat: '17.6800',
     lon: '83.3500',
     description: 'Eastern naval command approaches and crude refinery deepwater berths.',
@@ -73,44 +80,190 @@ export const PRESET_SCENARIOS: PresetScenario[] = [
   {
     id: 'haldia-sandheads',
     name: 'Haldia Sandheads',
-    category: 'East Coast',
+    category: 'India',
+    regionBadge: 'HOOGHLY ESTUARY',
     lat: '21.6000',
     lon: '88.0500',
-    description: 'Hooghly estuary navigational fairway with heavy bulk carrier traffic.',
+    description: 'Shallow Hooghly estuary fairway with heavy bulk carrier and coastal tanker traffic.',
   },
   {
     id: 'gulf-mannar',
     name: 'Gulf of Mannar / Palk Strait',
-    category: 'East Coast',
+    category: 'India',
+    regionBadge: 'BIOSPHERE RESERVE',
     lat: '9.1500',
     lon: '79.2000',
-    description: 'India-Sri Lanka international strait & coral reef biosphere reserve.',
+    description: 'India–Sri Lanka international transit fairway adjacent to sensitive coral biosphere.',
   },
 
-  // Strategic Chokepoints & Dark Tanker Corridors
+  // --- AMERICAS THEATER ---
   {
-    id: 'arabian-sea',
-    name: 'Arabian Sea Corridor',
-    category: 'Strategic Chokepoints',
-    lat: '18.5500',
-    lon: '72.4000',
-    description: 'Deep-sea international transit lane 80km off the continental shelf.',
+    id: 'gulf-mexico-dwh',
+    name: 'Gulf of Mexico (Macondo)',
+    category: 'Americas',
+    regionBadge: 'GULF OF MEXICO',
+    lat: '28.7366',
+    lon: '-88.3659',
+    description: 'Historic Deepwater Horizon zone with 3,000+ active drilling platforms & Loop Current drift.',
+  },
+  {
+    id: 'prince-william-sound',
+    name: 'Prince William Sound (Alaska)',
+    category: 'Americas',
+    regionBadge: 'ALASKA ARCTIC',
+    lat: '60.8333',
+    lon: '-146.8667',
+    description: 'Sub-arctic tanker transit fairway off Bligh Reef with complex glacial fjord currents.',
+  },
+  {
+    id: 'santa-barbara',
+    name: 'Santa Barbara Channel',
+    category: 'Americas',
+    regionBadge: 'CALIFORNIA PACIFIC',
+    lat: '34.3500',
+    lon: '-119.7000',
+    description: 'Pacific offshore drilling platforms adjacent to Channel Islands Marine Sanctuary.',
+  },
+  {
+    id: 'panama-balboa',
+    name: 'Panama Canal (Balboa Anchorage)',
+    category: 'Americas',
+    regionBadge: 'INTER-OCEAN CANAL',
+    lat: '8.8800',
+    lon: '-79.5200',
+    description: 'Pacific staging roadstead with dense multi-national tanker and container queues.',
+  },
+  {
+    id: 'santos-pre-salt',
+    name: 'Santos Basin Pre-Salt Hub',
+    category: 'Americas',
+    regionBadge: 'BRAZIL ATLANTIC',
+    lat: '-24.0500',
+    lon: '-46.3000',
+    description: 'South Atlantic deepwater FPSO oilfield production cluster and shuttle tanker lanes.',
+  },
+
+  // --- EUROPE & MEDITERRANEAN THEATER ---
+  {
+    id: 'dover-strait',
+    name: 'English Channel & Dover Strait',
+    category: 'Europe & Med',
+    regionBadge: 'ENGLISH CHANNEL',
+    lat: '51.0167',
+    lon: '1.4500',
+    description: 'World\'s busiest maritime separation scheme with 500+ daily vessel crossings and heavy tides.',
+  },
+  {
+    id: 'north-sea-brent',
+    name: 'North Sea Brent Oilfields',
+    category: 'Europe & Med',
+    regionBadge: 'NORTH SEA',
+    lat: '61.0500',
+    lon: '1.7167',
+    description: 'High-latitude stormy offshore platform clusters and UK–Norway subsea pipeline grid.',
+  },
+  {
+    id: 'gibraltar-strait',
+    name: 'Strait of Gibraltar',
+    category: 'Europe & Med',
+    regionBadge: 'MEDITERRANEAN GATEWAY',
+    lat: '35.9600',
+    lon: '-5.6000',
+    description: 'High-density Atlantic–Mediterranean chokepoint and premier offshore ship bunkering zone.',
+  },
+  {
+    id: 'baltic-bornholm',
+    name: 'Baltic Sea (Bornholm Basin)',
+    category: 'Europe & Med',
+    regionBadge: 'BALTIC SEA',
+    lat: '55.1500',
+    lon: '15.0000',
+    description: 'Crucial Northern European corridor with high frequency of dark-fleet oil tanker transits.',
+  },
+
+  // --- MIDDLE EAST & CHOKEPOINTS ---
+  {
+    id: 'strait-hormuz',
+    name: 'Strait of Hormuz',
+    category: 'Middle East',
+    regionBadge: 'PERSIAN GULF',
+    lat: '26.5600',
+    lon: '56.2500',
+    description: 'World\'s primary energy chokepoint (21M barrels/day) with frequent AIS spoofing activity.',
+  },
+  {
+    id: 'bab-el-mandeb',
+    name: 'Bab el-Mandeb Strait',
+    category: 'Middle East',
+    regionBadge: 'RED SEA',
+    lat: '12.5800',
+    lon: '43.3300',
+    description: 'Strategic southern Red Sea gateway near Yemen; high risk of abandoned and targeted tankers.',
+  },
+  {
+    id: 'suez-port-said',
+    name: 'Suez Canal North Roads',
+    category: 'Middle East',
+    regionBadge: 'SUEZ MEDITERRANEAN',
+    lat: '31.3500',
+    lon: '32.3200',
+    description: 'Eastern Mediterranean convoy staging roadstead for southbound crude carriers.',
+  },
+  {
+    id: 'cape-good-hope',
+    name: 'Cape of Good Hope Route',
+    category: 'Middle East',
+    regionBadge: 'SOUTH AFRICA',
+    lat: '-34.4000',
+    lon: '18.4500',
+    description: 'Rough-water southern Africa diversion lane for ultra-large crude carriers bypassing Red Sea.',
+  },
+
+  // --- ASIA-PACIFIC THEATER ---
+  {
+    id: 'singapore-strait',
+    name: 'Singapore Strait (Phillips Channel)',
+    category: 'Asia-Pacific',
+    regionBadge: 'STRAIT OF SINGAPORE',
+    lat: '1.2300',
+    lon: '103.7800',
+    description: 'World\'s densest crude transshipment bottleneck and Jurong Island petrochemical anchorage.',
   },
   {
     id: 'malacca-gateway',
-    name: 'Malacca Strait Gateway',
-    category: 'Strategic Chokepoints',
+    name: 'Malacca Strait (Great Channel)',
+    category: 'Asia-Pacific',
+    regionBadge: 'ANDAMAN SEA',
     lat: '5.6000',
     lon: '95.3000',
-    description: 'Great Channel entrance off Andaman & Nicobar islands.',
+    description: 'Great Channel transit corridor off Andaman & Nicobar islands servicing East Asian energy trade.',
   },
   {
-    id: 'strait-hormuz',
-    name: 'Strait of Hormuz Corridor',
-    category: 'Strategic Chokepoints',
-    lat: '26.5600',
-    lon: '56.2500',
-    description: 'Global petroleum chokepoint with high AIS transponder manipulation.',
+    id: 'south-china-sea',
+    name: 'South China Sea (Spratly Fairway)',
+    category: 'Asia-Pacific',
+    regionBadge: 'SOUTH CHINA SEA',
+    lat: '10.5000',
+    lon: '114.0000',
+    description: 'Major international energy sea lane with extensive unregistered ship-to-ship transfers.',
+  },
+  {
+    id: 'tokyo-bay',
+    name: 'Tokyo Bay (Uraga Channel)',
+    category: 'Asia-Pacific',
+    regionBadge: 'JAPAN PACIFIC',
+    lat: '35.1800',
+    lon: '139.7300',
+    description: 'Japan\'s premier industrial energy corridor and Yokohama–Kawasaki refinery fairways.',
+  },
+  {
+    id: 'mauritius-wakashio',
+    name: 'Mauritius Coral Reefs',
+    category: 'Asia-Pacific',
+    regionBadge: 'INDIAN OCEAN',
+    lat: '-20.4400',
+    lon: '57.7500',
+    description: 'Pristine UNESCO coral atoll and biosphere sanctuary (MV Wakashio grounding impact zone).',
   },
 ];
 
@@ -122,7 +275,7 @@ export default function ForensicDashboardPage() {
   const [caseModalOpen, setCaseModalOpen] = useState(false);
 
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>('mumbai-offshore');
-  const [categoryFilter, setCategoryFilter] = useState<'ALL' | 'West Coast' | 'East Coast' | 'Strategic Chokepoints'>('ALL');
+  const [categoryFilter, setCategoryFilter] = useState<ScenarioCategory>('ALL');
 
   const [imageUrl, setImageUrl] = useState('https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1200&q=80');
   const [lat, setLat] = useState('18.9000');
@@ -443,8 +596,8 @@ export default function ForensicDashboardPage() {
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono">
-              {(['ALL', 'West Coast', 'East Coast', 'Strategic Chokepoints'] as const).map((cat) => (
+            <div className="flex flex-wrap items-center gap-1 p-0.5 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono">
+              {(['ALL', 'India', 'Americas', 'Europe & Med', 'Middle East', 'Asia-Pacific'] as const).map((cat) => (
                 <button
                   key={cat}
                   type="button"
@@ -455,7 +608,7 @@ export default function ForensicDashboardPage() {
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  {cat === 'Strategic Chokepoints' ? 'Chokepoints' : cat}
+                  {cat}
                 </button>
               ))}
             </div>
@@ -484,6 +637,9 @@ export default function ForensicDashboardPage() {
                     }`}
                   />
                   <span className="font-semibold">{preset.name}</span>
+                  <span className="px-1.5 py-0.2 rounded text-[9px] font-mono tracking-wider bg-slate-900/90 border border-slate-700 text-slate-400 group-hover:text-cyan-300">
+                    {preset.regionBadge}
+                  </span>
                   <span className="text-[10px] text-slate-400 font-mono">
                     {preset.lat}°N, {preset.lon}°E
                   </span>
