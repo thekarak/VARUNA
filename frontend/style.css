@@ -1,0 +1,245 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html, body, #root {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  background-color: #04070d;
+}
+
+body {
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #ffffff;
+  background: radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.04) 0%, transparent 65%),
+              radial-gradient(circle at 10% 20%, rgba(20, 184, 166, 0.03) 0%, transparent 50%),
+              #04070d;
+}
+
+.glass-nav {
+  background: rgba(4, 7, 13, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.bg-grid-subtle {
+  background-size: 50px 50px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+}
+
+.card-3d-wrap {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.card-3d-body {
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card-3d-body:hover {
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.85), 0 0 24px rgba(56, 189, 248, 0.14);
+}
+
+.gyro-3d-ring-1 {
+  transform: rotateX(65deg) rotateY(15deg);
+  animation: gyroSpin1 22s linear infinite;
+  transform-style: preserve-3d;
+}
+
+.gyro-3d-ring-2 {
+  transform: rotateX(-55deg) rotateY(30deg);
+  animation: gyroSpin2 18s linear infinite reverse;
+  transform-style: preserve-3d;
+}
+
+@keyframes gyroSpin1 {
+  0% { transform: rotateX(65deg) rotateY(15deg) rotateZ(0deg); }
+  100% { transform: rotateX(65deg) rotateY(15deg) rotateZ(360deg); }
+}
+
+@keyframes gyroSpin2 {
+  0% { transform: rotateX(-55deg) rotateY(30deg) rotateZ(0deg); }
+  100% { transform: rotateX(-55deg) rotateY(30deg) rotateZ(360deg); }
+}
+
+.depth-layer-front {
+  transform: translateZ(24px);
+}
+
+.radar-sweep-cone {
+  transform-origin: 170px 110px;
+  animation: radarSpin 4s linear infinite;
+}
+
+@keyframes radarSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.pulse-wave {
+  animation: wavePulse 3s ease-in-out infinite;
+}
+
+@keyframes wavePulse {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.04); }
+}
+
+.vessel-beacon {
+  animation: beaconPulse 1.8s ease-out infinite;
+}
+
+@keyframes beaconPulse {
+  0% { r: 3.5px; opacity: 1; }
+  100% { r: 12px; opacity: 0; }
+}
+
+.telemetry-scanline {
+  background: linear-gradient(180deg, transparent 0%, rgba(56, 189, 248, 0.12) 50%, transparent 100%);
+  background-size: 100% 200%;
+  animation: scanline 2.5s linear infinite;
+}
+
+@keyframes scanline {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 0% 200%; }
+}
+
+.slide-3d-wrap {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.slide-3d-up {
+  opacity: 0;
+  transform: perspective(1200px) rotateX(22deg) translateY(60px) translateZ(-60px) scale(0.95);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), filter 0.85s ease;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+  filter: blur(2px);
+}
+
+.slide-3d-up.is-revealed {
+  opacity: 1;
+  transform: perspective(1200px) rotateX(0deg) translateY(0px) translateZ(0px) scale(1);
+  filter: blur(0px);
+}
+
+.slide-3d-left {
+  opacity: 0;
+  transform: perspective(1200px) rotateY(-18deg) translateX(-60px) translateZ(-50px) scale(0.95);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), filter 0.85s ease;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+  filter: blur(2px);
+}
+
+.slide-3d-left.is-revealed {
+  opacity: 1;
+  transform: perspective(1200px) rotateY(0deg) translateX(0px) translateZ(0px) scale(1);
+  filter: blur(0px);
+}
+
+.slide-3d-right {
+  opacity: 0;
+  transform: perspective(1200px) rotateY(18deg) translateX(60px) translateZ(-50px) scale(0.95);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), filter 0.85s ease;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+  filter: blur(2px);
+}
+
+.slide-3d-right.is-revealed {
+  opacity: 1;
+  transform: perspective(1200px) rotateY(0deg) translateX(0px) translateZ(0px) scale(1);
+  filter: blur(0px);
+}
+
+.slide-3d-scale {
+  opacity: 0;
+  transform: perspective(1200px) translateZ(-100px) scale(0.92);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+}
+
+.slide-3d-scale.is-revealed {
+  opacity: 1;
+  transform: perspective(1200px) translateZ(0px) scale(1);
+}
+
+.shadow-cyan-glow {
+  box-shadow: 0 0 30px rgba(56, 189, 248, 0.25);
+}
+
+.shadow-emerald-glow {
+  box-shadow: 0 0 30px rgba(52, 211, 153, 0.25);
+}
+
+.gauge-circle-fill {
+  transition: stroke-dashoffset 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: center;
+  transform: rotate(-90deg);
+}
+
+.laser-scanner-line {
+  animation: laserScan 3s ease-in-out infinite alternate;
+}
+
+@keyframes laserScan {
+  0% { transform: translateY(0%); opacity: 0.8; }
+  50% { opacity: 0.4; }
+  100% { transform: translateY(100%); opacity: 0.8; }
+}
+
+.radar-scope-sweep {
+  transform-origin: 50% 50%;
+  animation: radarScopeSpin 3.5s linear infinite;
+}
+
+@keyframes radarScopeSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #38bdf8;
+  cursor: pointer;
+  box-shadow: 0 0 10px #38bdf8;
+  border: 2px solid #ffffff;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #38bdf8;
+  cursor: pointer;
+  box-shadow: 0 0 10px #38bdf8;
+  border: 2px solid #ffffff;
+}
+
+@keyframes initialSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
