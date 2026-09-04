@@ -108,9 +108,10 @@ export const MapViewer: React.FC<MapViewerProps> = ({
 
   useEffect(() => {
     if (mapInstanceRef.current && center) {
-      mapInstanceRef.current.setView(center, zoom, { animate: true });
+      const currentZoom = mapInstanceRef.current.getZoom() || 10;
+      mapInstanceRef.current.setView(center, currentZoom, { animate: true });
     }
-  }, [center, zoom]);
+  }, [center]);
 
   useEffect(() => {
     if (!mapInstanceRef.current || !layersGroupRef.current) return;
