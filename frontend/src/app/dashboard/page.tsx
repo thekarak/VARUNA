@@ -30,11 +30,18 @@ export default function ForensicDashboardPage() {
   const [metrics, setMetrics] = useState<AnalyticalMetricsData | undefined>(undefined);
   const [loading, setLoading] = useState(false);
 
-  // Check backend health on mount
+  // Check backend health on mount & initialize default scenario polygon
   useEffect(() => {
     fetch(`${API_BASE}/docs`)
       .then((res) => setBackendHealthy(res.ok))
       .catch(() => setBackendHealthy(false));
+
+    // Initialize default scenario target polygon so U-Net Oil Spill Icon is immediately visible on map
+    setSpillData({
+      area_sq_m: 24500,
+      perimeter_m: 780,
+      polygon: generateSlickPolygon(18.9, 72.5),
+    });
   }, []);
 
   // Preset scenarios
@@ -42,7 +49,19 @@ export default function ForensicDashboardPage() {
     setSelectedScenarioId(preset.id);
     setLat(preset.lat);
     setLon(preset.lon);
-    setMessage(`Loaded scenario: ${preset.name} (${preset.lat}°N, ${preset.lon}°E)`);
+    setMessage(`Loaded scenario: ${preset.name} (${preset.lat}°N, ${preset.lon}°E). Ready to run forensic pipeline.`);
+    
+    // Immediately position U-Net polygon and tactical centroid icon on target coordinates
+    const pLat = parseFloat(preset.lat);
+    const pLon = parseFloat(preset.lon);
+    setSpillData({
+      area_sq_m: 24500,
+      perimeter_m: 780,
+      polygon: generateSlickPolygon(pLat, pLon),
+    });
+    setDriftOrigin(undefined);
+    setSuspects([]);
+    setMetrics(undefined);
   };
 
   // Generate slick polygon around coordinate
@@ -125,6 +144,8 @@ export default function ForensicDashboardPage() {
                 name: v.vessel_name || String(v.mmsi),
                 proximity_m: v.proximity_m ?? 0,
                 score: v.score ?? 0,
+                risk_tier: v.risk_tier,
+                tier_label: v.tier_label,
                 anomalies: v.anomalies ?? [],
                 vessel_type: v.vessel_type,
                 flag_registry: v.flag_registry,

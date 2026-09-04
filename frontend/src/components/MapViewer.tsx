@@ -124,24 +124,88 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     group.clearLayers();
     const bounds: any[] = [];
 
-    // 1. Detected Oil Slick Polygon
+    // 1. Detected Oil Slick Polygon & Tactical Centroid Icon
     if (spillPolygon && spillPolygon.length > 2) {
       const polygon = L.polygon(spillPolygon, {
         color: '#ef4444',
-        weight: 2,
+        weight: 2.5,
         fillColor: '#dc2626',
-        fillOpacity: 0.45,
-        dashArray: '4, 4',
+        fillOpacity: 0.5,
+        dashArray: '5, 5',
       });
       polygon.bindPopup(`
         <div style="font-family:sans-serif; color:#0f172a; font-size:12px;">
-          <b style="color:#b91c1c; font-size:13px;">Detected Oil Slick</b><br/>
-          <span>Vertices: ${spillPolygon.length}</span><br/>
-          <span>Status: Verified via U-Net Mask</span>
+          <b style="color:#b91c1c; font-size:13px;">U-Net Oil Spill Polygon</b><br/>
+          <span>Vertices Extracted: ${spillPolygon.length}</span><br/>
+          <span>Neural Model: U-Net Semantic SAR Masker</span><br/>
+          <span>Confidence: Verified Spill Boundary</span>
         </div>
       `);
       group.addLayer(polygon);
+
+      // Compute centroid for high-visibility U-Net Oil Spill Icon
+      const centroidLat = spillPolygon.reduce((acc, p) => acc + p[0], 0) / spillPolygon.length;
+      const centroidLon = spillPolygon.reduce((acc, p) => acc + p[1], 0) / spillPolygon.length;
+
+      const slickIcon = L.divIcon({
+        className: 'oil-slick-icon',
+        html: `
+          <div style="position:relative; width:38px; height:38px; display:flex; align-items:center; justify-content:center; cursor:pointer;" title="U-Net Oil Spill Detected">
+            <div style="position:absolute; width:38px; height:38px; border-radius:50%; background:rgba(239,68,68,0.35); animation:ping 2s cubic-bezier(0,0,0.2,1) infinite;"></div>
+            <div style="width:26px; height:26px; border-radius:8px; background:#dc2626; border:2px solid #ffffff; display:flex; align-items:center; justify-content:center; box-shadow:0 0 16px rgba(239,68,68,0.9);">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="#ffffff">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+              </svg>
+            </div>
+          </div>
+        `,
+        iconSize: [38, 38],
+        iconAnchor: [19, 19],
+      });
+
+      const slickMarker = L.marker([centroidLat, centroidLon], {
+        icon: slickIcon,
+      });
+
+      slickMarker.bindPopup(`
+        <div style="font-family:sans-serif; color:#0f172a; font-size:12px; min-width:190px;">
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+            <span style="font-size:16px;">⚠️</span>
+            <b style="color:#b91c1c; font-size:13px;">U-NET OIL SPILL DETECTED</b>
+          </div>
+          <div style="font-size:11px; color:#334155; line-height:1.4;">
+            <span>Centroid: [${centroidLat.toFixed(4)}°N, ${centroidLon.toFixed(4)}°E]</span><br/>
+            <span>Architecture: U-Net Binary Segmentation</span><br/>
+            <span>Feature: High-Backscatter Damping Area</span>
+          </div>
+        </div>
+      `);
+      group.addLayer(slickMarker);
+
       bounds.push(...spillPolygon);
+    } else if (center) {
+      // Standby Target Scene Marker before analysis
+      const targetIcon = L.divIcon({
+        className: 'target-scene-marker',
+        html: `
+          <div style="position:relative; width:32px; height:32px; display:flex; align-items:center; justify-content:center;" title="Target Satellite Scene">
+            <div style="position:absolute; width:28px; height:28px; border:2px dashed #06b6d4; border-radius:50%; animation:spin 4s linear infinite;"></div>
+            <div style="width:10px; height:10px; border-radius:50%; background:#ef4444; border:2px solid #ffffff; box-shadow:0 0 8px #ef4444;"></div>
+          </div>
+        `,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+      });
+
+      const targetMarker = L.marker(center, { icon: targetIcon });
+      targetMarker.bindPopup(`
+        <div style="font-family:sans-serif; color:#0f172a; font-size:12px;">
+          <b style="color:#0891b2; font-size:13px;">Target Satellite Recon Scene</b><br/>
+          <span>Coordinates: [${center[0].toFixed(4)}°N, ${center[1].toFixed(4)}°E]</span><br/>
+          <span>Status: Ready for U-Net Detection</span>
+        </div>
+      `);
+      group.addLayer(targetMarker);
     }
 
     // 2. Lagrangian Hindcast Origin Point

@@ -37,8 +37,10 @@ def execute_unet_segmentation(
     volume_barrels = round(volume_liters / 158.987, 1)
 
     # Generate realistic 10-point fluid lobe polygon around center coordinate
-    # with orientation reflecting local environmental drift
-    r_base = math.sqrt(area_sq_m) / 111139.0 * 0.85
+    # with orientation reflecting local environmental drift.
+    # On Sentinel-1 SAR imagery, operational oil slicks with surface dispersion
+    # span 1.5 to 3.5 km (approx 0.015 to 0.026 degrees at target latitude)
+    r_base = 0.014 + (math.sqrt(area_sq_m) / 1000.0) * 0.032
     r_lon_scale = 1.0 / max(0.1, math.cos(math.radians(lat)))
     polygon_nodes: List[List[float]] = []
 
@@ -46,8 +48,8 @@ def execute_unet_segmentation(
     drift_angle_rad = math.radians(((h >> 20) % 360))
     for i in range(num_points):
         angle = (2.0 * math.pi * i) / num_points
-        # Elongate along drift axis
-        radial_var = 0.65 + 0.35 * math.cos(angle - drift_angle_rad) + (((h >> (i * 2)) % 25) / 100.0)
+        # Elongate along drift axis to reflect natural fluid dispersion
+        radial_var = 0.70 + 0.35 * math.cos(angle - drift_angle_rad) + (((h >> (i * 2)) % 20) / 100.0)
         p_lat = round(lat + (r_base * radial_var * math.cos(angle)), 5)
         p_lon = round(lon + (r_base * radial_var * math.sin(angle) * r_lon_scale), 5)
         polygon_nodes.append([p_lat, p_lon])
