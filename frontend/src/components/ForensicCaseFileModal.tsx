@@ -10,6 +10,13 @@ export interface ForensicCaseData {
   longitude: number;
   spillArea?: number;
   spillPerimeter?: number;
+  basin?: string;
+  windSpeedKts?: number;
+  windBearingDeg?: number;
+  currentSpeedMs?: number;
+  currentBearingDeg?: number;
+  bonnCode?: string;
+  estimatedVolumeBbls?: number;
   driftOrigin?: {
     latitude: number;
     longitude: number;
@@ -21,6 +28,9 @@ export interface ForensicCaseData {
     proximity_m: number;
     score: number;
     anomalies: string[];
+    vessel_type?: string;
+    flag_registry?: string;
+    dark_vessel_flag?: boolean;
   }>;
   driftDistanceKm?: number;
   simulationHours?: number;
@@ -50,6 +60,11 @@ export const ForensicCaseFileModal: React.FC<Props> = ({ isOpen, onClose, caseDa
   const areaSqM = caseData.spillArea || 12500;
   const perimeterM = caseData.spillPerimeter || (areaSqM * 0.38);
   const driftDistKm = caseData.driftDistanceKm || 8.74;
+  const basin = caseData.basin || 'Regional Maritime Basin';
+  const windKts = caseData.windSpeedKts ?? 12.5;
+  const windDeg = caseData.windBearingDeg ?? 245;
+  const currSpeed = caseData.currentSpeedMs ?? 0.45;
+  const currDeg = caseData.currentBearingDeg ?? 68;
   const suspects = caseData.suspects && caseData.suspects.length > 0 ? caseData.suspects : [
     {
       mmsi: 987654321,
@@ -161,9 +176,9 @@ export const ForensicCaseFileModal: React.FC<Props> = ({ isOpen, onClose, caseDa
       y += 5;
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8.5);
-      doc.text('Wind Vectors: NOAA Global Forecast System (GFS) 0.25° grid — 14.2 knots, 245° WSW vector.', 14, y);
+      doc.text(`Wind Vectors: NOAA Global Forecast System (GFS) — ${windKts.toFixed(1)} kts, bearing ${windDeg.toFixed(0)}°.`, 14, y);
       y += 4.5;
-      doc.text('Current Vectors: Copernicus Marine Service (CMEMS) Surface Currents — 0.85 m/s, bearing 068° ENE.', 14, y);
+      doc.text(`Current Vectors: CMEMS Surface Currents — ${currSpeed.toFixed(2)} m/s, bearing ${currDeg.toFixed(0)}°. Basin: ${basin}.`, 14, y);
       y += 4.5;
       doc.text(`Particle Simulation: 5,000 Lagrangian tracers integrated backward ${caseData.simulationHours || 12} hours in time.`, 14, y);
       y += 4.5;
@@ -179,11 +194,11 @@ export const ForensicCaseFileModal: React.FC<Props> = ({ isOpen, onClose, caseDa
       doc.setFontSize(8.5);
       doc.text('Database Engine: PostgreSQL with PostGIS ST_DWithin & ST_Intersects 4D spatio-temporal query.', 14, y);
       y += 4.5;
-      doc.text('AIS Blackout Identified: Target vessel ceased AIS transmission 42 minutes prior to calculated discharge.', 14, y);
+      doc.text('AIS Blackout Identified: Target vessel ceased AIS transmission prior to calculated discharge window.', 14, y);
       y += 4.5;
-      doc.text('Blackout Duration: 2 hours 48 minutes total communication gap without shore-station handshake.', 14, y);
+      doc.text('Kinematic Reconstruction: Dead-reckoning corridor intersects ocean hindcast particle cloud.', 14, y);
       y += 4.5;
-      doc.text('Dead-Reckoned Trajectory: Constant bearing kinematic reconstruction passes within 120.4m of origin.', 14, y);
+      doc.text(`Dead-Reckoned Trajectory: Passes within ${(suspects[0]?.proximity_m ?? 50.0).toFixed(1)}m of calculated discharge origin.`, 14, y);
       y += 7;
 
       // Section 6: Behavioral Anomaly Metrics
@@ -409,10 +424,10 @@ export const ForensicCaseFileModal: React.FC<Props> = ({ isOpen, onClose, caseDa
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
               <div className="p-3 rounded-lg bg-slate-900/70 border border-slate-800">
-                <span className="text-slate-400 text-[11px] block mb-1">Ocean Current &amp; Wind Vector Fields:</span>
+                <span className="text-slate-400 text-[11px] block mb-1">Ocean Current &amp; Wind Vector Fields ({basin}):</span>
                 <div className="space-y-1 text-slate-300">
-                  <div>&bull; NOAA GFS 10m Wind: <b>14.2 knots</b> (Direction 245° WSW)</div>
-                  <div>&bull; CMEMS Surface Current: <b>0.85 m/s</b> (Bearing 068° ENE)</div>
+                  <div>&bull; NOAA GFS 10m Wind: <b>{windKts.toFixed(1)} knots</b> (Bearing {windDeg.toFixed(0)}°)</div>
+                  <div>&bull; CMEMS Surface Current: <b>{currSpeed.toFixed(2)} m/s</b> (Bearing {currDeg.toFixed(0)}°)</div>
                   <div>&bull; Reverse Particle Integration: <b>{caseData.simulationHours || 12} Hours Backward</b></div>
                 </div>
               </div>
@@ -442,8 +457,8 @@ export const ForensicCaseFileModal: React.FC<Props> = ({ isOpen, onClose, caseDa
                 <span>Proximity to Origin: <b className="text-red-400">{suspects[0]?.proximity_m.toFixed(1)} meters</b></span>
               </div>
               <div className="p-2.5 rounded bg-red-950/30 border border-red-900/50 text-red-300 text-[11px]">
-                ⚠️ <b>Telemetry Loss Incident:</b> AIS signal abruptly dropped at 18.8821°N, 72.4810°E. Blackout duration: <b>2h 48m</b>.
-                Kinematic dead-reckoning trajectory through the gap directly intersects the calculated oil discharge origin.
+                ⚠️ <b>Telemetry Loss Incident:</b> AIS signal suppressed in vicinity of [{(originLat - 0.012).toFixed(4)}°N, {(originLon - 0.012).toFixed(4)}°E].
+                Kinematic dead-reckoning trajectory through the gap passes within <b>{(suspects[0]?.proximity_m ?? 50.0).toFixed(1)}m</b> of calculated discharge origin.
               </div>
             </div>
           </div>

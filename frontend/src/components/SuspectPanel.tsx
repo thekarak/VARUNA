@@ -8,6 +8,10 @@ export interface Suspect {
   proximity_m: number;
   score: number;
   anomalies: string[];
+  vessel_type?: string;
+  flag_registry?: string;
+  dark_vessel_flag?: boolean;
+  path?: [number, number][];
 }
 
 interface SuspectPanelProps {
@@ -42,7 +46,7 @@ export const SuspectPanel: React.FC<SuspectPanelProps> = ({ suspects = [] }) => 
         </span>
       </div>
 
-      <div className="space-y-3 max-h-[290px] overflow-y-auto pr-1">
+      <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
         {suspects.map((suspect, index) => {
           const isTopSuspect = index === 0;
           return (
@@ -54,13 +58,23 @@ export const SuspectPanel: React.FC<SuspectPanelProps> = ({ suspects = [] }) => 
                   : 'bg-slate-800/50 border-slate-700/60'
               }`}
             >
-              <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="flex items-start justify-between gap-2 mb-1.5">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-xs text-slate-400 font-bold">#{index + 1}</span>
                     <h4 className="font-bold text-slate-100 text-sm">{suspect.name}</h4>
                   </div>
-                  <span className="text-[11px] font-mono text-cyan-400/90">MMSI: {suspect.mmsi}</span>
+                  <div className="flex items-center gap-2 mt-0.5 text-[11px] font-mono">
+                    <span className="text-cyan-400/90">MMSI: {suspect.mmsi}</span>
+                    {suspect.flag_registry && (
+                      <span className="text-slate-400">· {suspect.flag_registry}</span>
+                    )}
+                  </div>
+                  {suspect.vessel_type && (
+                    <div className="text-[10px] text-slate-400 font-mono italic">
+                      {suspect.vessel_type}
+                    </div>
+                  )}
                 </div>
 
                 <div className="text-right">

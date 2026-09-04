@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, DateTime, Float, ForeignKey, Integer, JSON
+from sqlalchemy import Column, String, DateTime, Float, ForeignKey, Integer, JSON, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from geoalchemy2 import Geometry

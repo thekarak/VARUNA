@@ -91,10 +91,10 @@ export default function ForensicDashboardPage() {
 
           // 1. Slick Data & Polygon
           const area = result.spill_area_sq_m || 12500;
-          const polygon = generateSlickPolygon(parsedLat, parsedLon);
+          const polygon = result.polygon || generateSlickPolygon(parsedLat, parsedLon);
           setSpillData({
             area_sq_m: area,
-            perimeter_m: area * 0.38,
+            perimeter_m: result.spill_perimeter_m || (area * 0.38),
             polygon: polygon,
           });
 
@@ -126,7 +126,10 @@ export default function ForensicDashboardPage() {
                 proximity_m: v.proximity_m ?? 0,
                 score: v.score ?? 0,
                 anomalies: v.anomalies ?? [],
-                path: [
+                vessel_type: v.vessel_type,
+                flag_registry: v.flag_registry,
+                dark_vessel_flag: v.dark_vessel_flag,
+                path: v.path || [
                   [origLat - offset * 1.5, origLon - offset * 1.2],
                   [origLat - offset * 0.4, origLon - offset * 0.2],
                   [origLat + offset * 0.3, origLon + offset * 0.5],
@@ -139,12 +142,21 @@ export default function ForensicDashboardPage() {
 
           // 4. Analytical Metrics
           const driftDist = computeDistanceKm(parsedLat, parsedLon, origLat, origLon);
+          const env = result.environmental_forcing || {};
           setMetrics({
             area_sq_m: area,
-            perimeter_m: area * 0.38,
+            perimeter_m: result.spill_perimeter_m || (area * 0.38),
             avg_speed_knots: 13.6,
-            drift_distance_km: driftDist > 0.1 ? driftDist : 8.74,
-            simulation_time_hours: 12,
+            drift_distance_km: env.drift_distance_km ?? (driftDist > 0.1 ? driftDist : 8.74),
+            simulation_time_hours: env.simulation_hours ?? 12,
+            basin: env.basin,
+            wind_speed_kts: env.wind_speed_kts,
+            wind_bearing_deg: env.wind_bearing_deg,
+            current_speed_ms: env.current_speed_ms,
+            current_bearing_deg: env.current_bearing_deg,
+            estimated_volume_bbls: result.estimated_volume_bbls,
+            bonn_agreement_code: result.bonn_agreement_code,
+            confidence_score: result.confidence_score,
             driftOrigin: originObj,
           });
 
@@ -435,6 +447,13 @@ export default function ForensicDashboardPage() {
           longitude: parseFloat(lon) || 72.5,
           spillArea: spillData?.area_sq_m,
           spillPerimeter: spillData?.perimeter_m,
+          basin: metrics?.basin,
+          windSpeedKts: metrics?.wind_speed_kts,
+          windBearingDeg: metrics?.wind_bearing_deg,
+          currentSpeedMs: metrics?.current_speed_ms,
+          currentBearingDeg: metrics?.current_bearing_deg,
+          bonnCode: metrics?.bonn_agreement_code,
+          estimatedVolumeBbls: metrics?.estimated_volume_bbls,
           driftOrigin: driftOrigin,
           suspects: suspects,
           driftDistanceKm: metrics?.drift_distance_km,
