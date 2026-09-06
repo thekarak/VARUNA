@@ -78,6 +78,7 @@ const mockScenarios = [
       estimatedVolumeBbl: 320,
       leewayFactor: 3.1,
       attributionConfidence: 94.8,
+      spillAgeHours: 18.4,
       hydrocarbonType: "Heavy Crude Sludge / Bilge Residue"
     },
     coastGuardStations: [
@@ -103,6 +104,14 @@ const mockScenarios = [
       [2.224, 102.131],
       [2.238, 102.118]
     ],
+    forecastTrajectory: [
+      [2.2417, 102.1394],
+      [2.2287, 102.1235],
+      [2.2157, 102.1076],
+      [2.2027, 102.0917],
+      [2.1897, 102.0758],
+      [2.1767, 102.0599]
+    ],
     driftVector: { angle: 210, speedKts: 2.1, durationHours: 14.2 },
     primaryVesselMmsi: "636019842",
     metrics: {
@@ -113,6 +122,7 @@ const mockScenarios = [
       estimatedVolumeBbl: 260,
       leewayFactor: 3.4,
       attributionConfidence: 91.6,
+      spillAgeHours: 14.2,
       hydrocarbonType: "Medium Fuel Oil / Slops"
     },
     coastGuardStations: [
@@ -138,6 +148,14 @@ const mockScenarios = [
       [58.148, 1.702],
       [58.169, 1.678]
     ],
+    forecastTrajectory: [
+      [58.1708, 1.7139],
+      [58.1595, 1.6863],
+      [58.1482, 1.6587],
+      [58.1369, 1.6311],
+      [58.1256, 1.6035],
+      [58.1143, 1.5759]
+    ],
     driftVector: { angle: 240, speedKts: 2.45, durationHours: 12.8 },
     primaryVesselMmsi: "257088120",
     metrics: {
@@ -148,6 +166,7 @@ const mockScenarios = [
       estimatedVolumeBbl: 410,
       leewayFactor: 2.9,
       attributionConfidence: 96.1,
+      spillAgeHours: 12.8,
       hydrocarbonType: "Condensate & Oily Sludge"
     },
     coastGuardStations: [
@@ -173,6 +192,14 @@ const mockScenarios = [
       [34.851, 25.632],
       [34.867, 25.615]
     ],
+    forecastTrajectory: [
+      [34.8694, 25.6444],
+      [34.8522, 25.6248],
+      [34.8350, 25.6052],
+      [34.8178, 25.5856],
+      [34.8006, 25.5660],
+      [34.7834, 25.5464]
+    ],
     driftVector: { angle: 215, speedKts: 1.65, durationHours: 16.0 },
     primaryVesselMmsi: "371994000",
     metrics: {
@@ -183,6 +210,7 @@ const mockScenarios = [
       estimatedVolumeBbl: 210,
       leewayFactor: 3.2,
       attributionConfidence: 89.2,
+      spillAgeHours: 16.0,
       hydrocarbonType: "Heavy Bunker Bilge Flushing"
     },
     coastGuardStations: [

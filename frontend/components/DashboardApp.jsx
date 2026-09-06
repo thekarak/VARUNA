@@ -1242,6 +1242,7 @@ function DashboardApp() {
       setIsRunningPipeline(false);
       setVessels(result.vessels);
       setMetrics(result.metrics);
+      if (result.scenario) setActiveScenario(result.scenario);
     });
   };
 
