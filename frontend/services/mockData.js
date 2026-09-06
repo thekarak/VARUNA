@@ -1,5 +1,50 @@
 const mockScenarios = [
   {
+    id: "kutch",
+    name: "Gulf of Kutch // Indian EEZ",
+    region: "Arabian Sea (Gujarat Coast, India)",
+    lat: 22.5200,
+    lng: 69.7100,
+    zoom: 11,
+    imageUrl: "data/sar/sentinel1_kutch_slick.png",
+    originCoord: { lat: 22.4352, lng: 69.6005 },
+    slickPolygon: [
+      [22.518, 69.702],
+      [22.528, 69.718],
+      [22.522, 69.735],
+      [22.508, 69.728],
+      [22.502, 69.711],
+      [22.512, 69.698]
+    ],
+    forecastTrajectory: [
+      [22.5200, 69.7100],
+      [22.5245, 69.7180],
+      [22.5290, 69.7260],
+      [22.5335, 69.7340],
+      [22.5380, 69.7420],
+      [22.5425, 69.7500]
+    ],
+    driftVector: { angle: 242, speedKts: 1.25, durationHours: 10.4 },
+    primaryVesselMmsi: "419001234",
+    metrics: {
+      areaKm2: 2.42,
+      perimeterKm: 8.1,
+      driftDistanceNM: 6.69,
+      segmentationIoU: 97.1,
+      estimatedVolumeBbl: 2917,
+      leewayFactor: 3.0,
+      attributionConfidence: 98.4,
+      spillAgeHours: 10.4,
+      weatheringStage: "Evaporating / Spreading",
+      hydrocarbonType: "Heavy Bunker Sludge / Bilge Residue"
+    },
+    coastGuardStations: [
+      { id: "cg-vadinar", name: "Indian Coast Guard (ICG) FOB Vadinar", base: "Vadinar Anchorage Sector", distanceNM: 14.8, channel: "VHF Ch 16 / 14", status: "ONLINE", phone: "+91 2833 252 200", etaMin: 18 },
+      { id: "cg-okha", name: "ICG District HQ Okha", base: "Okha Port Sector Command", distanceNM: 24.5, channel: "VHF Ch 16 / 54", status: "ONLINE", phone: "+91 2892 262 101", etaMin: 28 },
+      { id: "cg-mrcc-mumbai", name: "MRCC Mumbai Operational Cell", base: "Western Naval Command HQ", distanceNM: 185.0, channel: "Inmarsat-C / DSC", status: "ONLINE", phone: "+91 22 2431 6558", etaMin: 55 }
+    ]
+  },
+  {
     id: "hormuz",
     name: "Strait of Hormuz // Fujairah Exit",
     region: "Persian Gulf & Gulf of Oman",
@@ -15,6 +60,13 @@ const mockScenarios = [
       [24.631, 54.358],
       [24.618, 54.332],
       [24.629, 54.305]
+    ],
+    forecastTrajectory: [
+      [24.6367, 54.3292],
+      [24.6480, 54.3410],
+      [24.6590, 54.3530],
+      [24.6700, 54.3650],
+      [24.6810, 54.3770]
     ],
     driftVector: { angle: 225, speedKts: 1.84, durationHours: 18.4 },
     primaryVesselMmsi: "538009214",
@@ -142,6 +194,105 @@ const mockScenarios = [
 ];
 
 const mockVesselsByScenario = {
+  kutch: [
+    {
+      mmsi: "419001234",
+      imo: "9412345",
+      name: "OCEANIC SENTINEL",
+      type: "Crude Oil Tanker",
+      flag: "India",
+      flagCode: "IN",
+      dwt: 158000,
+      owner: "Great Eastern Shipping Lines",
+      riskScore: 98.4,
+      proximityNM: 1.24,
+      driftConcordance: 97.8,
+      speedDelta: -11.4,
+      courseDelta: 28.4,
+      blackoutDurationHours: 2.75,
+      warningTags: ["Speed Drop (14.8->3.4 kts)", "AIS Void (2.75h)", "Origin Intercept (1.2 NM)", "Discharge Window"],
+      speedHistory: [14.8, 14.8, 14.7, 10.2, 5.1, 3.4, 3.5, 4.0, 9.8, 14.2, 14.7, 14.8],
+      trail: [
+        { lat: 22.38, lng: 69.45, status: "active", time: "T-14h" },
+        { lat: 22.41, lng: 69.52, status: "active", time: "T-12h" },
+        { lat: 22.43, lng: 69.58, status: "blackout_start", time: "T-10.4h" },
+        { lat: 22.44, lng: 69.60, status: "blackout_interpolated", time: "T-9h" },
+        { lat: 22.45, lng: 69.64, status: "blackout_end", time: "T-7.6h" },
+        { lat: 22.48, lng: 69.72, status: "active", time: "T-4h" },
+        { lat: 22.52, lng: 69.80, status: "active", time: "T0" }
+      ]
+    },
+    {
+      mmsi: "419000892",
+      imo: "9382104",
+      name: "MT DESH SHANTI",
+      type: "Crude Oil Tanker",
+      flag: "India",
+      flagCode: "IN",
+      dwt: 114000,
+      owner: "Shipping Corporation of India",
+      riskScore: 8.5,
+      proximityNM: 12.8,
+      driftConcordance: 14.2,
+      speedDelta: -0.2,
+      courseDelta: 1.8,
+      blackoutDurationHours: 0,
+      warningTags: ["Nominal Transit", "AIS Continuous"],
+      speedHistory: [13.2, 13.1, 13.0, 13.2, 13.1, 13.2, 13.0, 13.1, 13.2, 13.1, 13.0, 13.1],
+      trail: [
+        { lat: 22.25, lng: 69.30, status: "active", time: "T-14h" },
+        { lat: 22.30, lng: 69.42, status: "active", time: "T-10h" },
+        { lat: 22.35, lng: 69.55, status: "active", time: "T-5h" },
+        { lat: 22.40, lng: 69.68, status: "active", time: "T0" }
+      ]
+    },
+    {
+      mmsi: "563001823",
+      imo: "9615523",
+      name: "APL COLUMBUS",
+      type: "Container Ship",
+      flag: "Singapore",
+      flagCode: "SG",
+      dwt: 98000,
+      owner: "APL Singapore Ltd",
+      riskScore: 4.2,
+      proximityNM: 18.5,
+      driftConcordance: 8.0,
+      speedDelta: 0.1,
+      courseDelta: 0.9,
+      blackoutDurationHours: 0,
+      warningTags: ["Nominal Passage"],
+      speedHistory: [18.2, 18.1, 18.2, 18.0, 18.1, 18.2, 18.1, 18.2, 18.0, 18.1, 18.2, 18.1],
+      trail: [
+        { lat: 22.18, lng: 69.20, status: "active", time: "T-14h" },
+        { lat: 22.24, lng: 69.35, status: "active", time: "T-9h" },
+        { lat: 22.31, lng: 69.50, status: "active", time: "T0" }
+      ]
+    },
+    {
+      mmsi: "419000111",
+      imo: "9287654",
+      name: "INS TARANGINI PATROL",
+      type: "Law Enforcement / Coast Guard",
+      flag: "India",
+      flagCode: "IN",
+      dwt: 1400,
+      owner: "Indian Coast Guard / Navy",
+      riskScore: 1.1,
+      proximityNM: 22.1,
+      driftConcordance: 4.5,
+      speedDelta: 0.0,
+      courseDelta: 1.1,
+      blackoutDurationHours: 0,
+      warningTags: ["Law Enforcement", "Patrol Vector"],
+      speedHistory: [16.0, 16.0, 16.1, 16.0, 16.0, 16.1, 16.0, 16.0, 16.1, 16.0, 16.0, 16.1],
+      trail: [
+        { lat: 22.10, lng: 69.15, status: "active", time: "T-14h" },
+        { lat: 22.18, lng: 69.28, status: "active", time: "T-8h" },
+        { lat: 22.25, lng: 69.40, status: "active", time: "T0" }
+      ]
+    }
+  ],
   hormuz: [
     {
       mmsi: "538009214",

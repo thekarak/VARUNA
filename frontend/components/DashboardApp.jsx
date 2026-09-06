@@ -401,35 +401,84 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
       }).addTo(layerGroup);
     }
 
+    // Render Forward Drift Forecast Trajectory (+24h)
+    const forecastPts = activeScenario.forecastTrajectory || activeScenario.forecast_trajectory;
+    if (forecastPts && forecastPts.length > 0) {
+      const latlngs = forecastPts.map((p) => (Array.isArray(p) ? p : [p.lat, p.lon !== undefined ? p.lon : p.lng]));
+      const forecastLine = L.polyline(latlngs, {
+        color: "#f59e0b",
+        weight: 2.5,
+        dashArray: "6, 6",
+        opacity: 0.9
+      }).addTo(layerGroup);
+
+      forecastLine.bindTooltip("FORWARD DRIFT FORECAST (+24H CMEMS / GFS)", {
+        permanent: false,
+        direction: "top",
+        className: "leaflet-tooltip-dark font-mono text-[9px]"
+      });
+
+      const lastForecast = latlngs[latlngs.length - 1];
+      const forecastEndIcon = L.divIcon({
+        className: "custom-forecast-icon",
+        html: `<div class="relative flex items-center justify-center">
+                 <div class="absolute w-7 h-7 rounded-full bg-amber-400/30 animate-ping"></div>
+                 <div class="w-3.5 h-3.5 rounded-full bg-amber-400 border-2 border-white shadow-[0_0_12px_#f59e0b]"></div>
+               </div>`,
+        iconSize: [22, 22],
+        iconAnchor: [11, 11]
+      });
+
+      L.marker(lastForecast, { icon: forecastEndIcon }).addTo(layerGroup).bindTooltip("T+24H PREDICTED SLICK", {
+        permanent: true,
+        direction: "right",
+        className: "leaflet-tooltip-dark font-mono text-[9px]"
+      });
+    }
+
     vessels.forEach((vessel) => {
       const isSelected = selectedVessel && selectedVessel.mmsi === vessel.mmsi;
       const isPrimary = vessel.riskScore > 85;
 
-      if (vessel.track && vessel.track.length > 0) {
-        L.polyline(vessel.track, {
+      const trackPoints = vessel.track && vessel.track.length > 0
+        ? vessel.track
+        : (vessel.trail && vessel.trail.length > 0
+            ? vessel.trail.map((t) => [t.lat, t.lng])
+            : (vessel.trajectory && vessel.trajectory.length > 0
+                ? vessel.trajectory.map((t) => [t.lat, t.lon !== undefined ? t.lon : t.lng])
+                : []));
+
+      if (trackPoints.length > 0) {
+        L.polyline(trackPoints, {
           color: isPrimary ? "#38bdf8" : "#64748b",
           weight: isSelected ? 3 : 1.5,
           opacity: isSelected ? 0.9 : 0.4
         }).addTo(layerGroup);
       }
 
-      if (vessel.blackoutCorridor && vessel.blackoutCorridor.length > 0) {
-        const blackoutLine = L.polyline(vessel.blackoutCorridor, {
+      const blackoutPoints = vessel.blackoutCorridor && vessel.blackoutCorridor.length > 0
+        ? vessel.blackoutCorridor
+        : (vessel.trail && vessel.trail.length > 0
+            ? vessel.trail.filter((t) => t.status && t.status.includes("blackout")).map((t) => [t.lat, t.lng])
+            : []);
+
+      if (blackoutPoints.length > 0) {
+        const blackoutLine = L.polyline(blackoutPoints, {
           color: "#f43f5e",
           weight: isSelected ? 3.5 : 2.5,
           dashArray: "5, 5",
           opacity: 0.9
         }).addTo(layerGroup);
 
-        blackoutLine.bindTooltip("AIS BLACKOUT VOID // " + vessel.blackoutDurationHours + "H", {
+        blackoutLine.bindTooltip("AIS BLACKOUT VOID // " + (vessel.blackoutDurationHours || "GAP") + "H", {
           permanent: false,
           direction: "center",
           className: "leaflet-tooltip-dark"
         });
       }
 
-      if (vessel.track && vessel.track.length > 0) {
-        const lastPos = vessel.track[vessel.track.length - 1];
+      if (trackPoints.length > 0) {
+        const lastPos = trackPoints[trackPoints.length - 1];
         const vIcon = L.divIcon({
           className: "custom-vessel-icon",
           html: `<div class="relative flex items-center justify-center cursor-pointer">
@@ -456,7 +505,7 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
     <div className="relative w-full h-[580px] lg:h-[650px] rounded-2xl overflow-hidden border border-white/10 bg-[#04070d] shadow-2xl">
       <div ref={mapContainerRef} className="w-full h-full z-10" />
 
-      <div className="absolute top-4 left-4 z-20 pointer-events-auto bg-[#070c14]/92 backdrop-blur-xl border border-cyan-500/30 rounded-xl p-3.5 shadow-2xl font-mono text-[10px] space-y-2 max-w-[210px]">
+      <div className="absolute top-4 left-4 z-20 pointer-events-auto bg-[#070c14]/92 backdrop-blur-xl border border-cyan-500/30 rounded-xl p-3.5 shadow-2xl font-mono text-[10px] space-y-2 max-w-[220px]">
         <div className="text-cyan-400 font-bold border-b border-white/10 pb-1.5 flex items-center justify-between">
           <span className="tracking-wider uppercase">MAP OVERLAY LAYERS</span>
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
@@ -467,7 +516,11 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
         </div>
         <div className="flex items-center gap-2.5 text-slate-300">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-          <span>Reconstructed Origin</span>
+          <span>Reconstructed Origin (Hindcast)</span>
+        </div>
+        <div className="flex items-center gap-2.5 text-amber-400">
+          <span className="w-3.5 h-0.5 border-b-2 border-dashed border-amber-400"></span>
+          <span>Forward Forecast (+24h)</span>
         </div>
         <div className="flex items-center gap-2.5 text-slate-300">
           <span className="w-3.5 h-0.5 bg-sky-400"></span>
@@ -1415,7 +1468,9 @@ function DashboardApp() {
             <span className="text-xl sm:text-2xl font-black text-white mt-1 block">
               <CountUpNumber value={metrics.driftDistanceNM} decimals={1} /> <span className="text-xs font-normal text-cyan-400">NM</span>
             </span>
-            <span className="text-[8.5px] text-emerald-400 mt-1 block">T-18.4H HINDCAST</span>
+            <span className="text-[8.5px] text-emerald-400 mt-1 block">
+              T-{(metrics.spillAgeHours || (activeScenario.driftVector && activeScenario.driftVector.durationHours) || 18.4).toFixed(1)}H HINDCAST
+            </span>
           </div>
 
           <div className="p-4 rounded-2xl bg-[#070c14]/92 border border-white/10 shadow-xl flex flex-col justify-between min-h-[115px]">
@@ -1431,7 +1486,7 @@ function DashboardApp() {
             <span className="text-xl sm:text-2xl font-black text-white mt-1 block">
               ~<CountUpNumber value={metrics.estimatedVolumeBbl} decimals={0} /> <span className="text-xs font-normal text-cyan-400">BBL</span>
             </span>
-            <span className="text-[8.5px] text-amber-400 mt-1 block">SLUDGE / BILGE</span>
+            <span className="text-[8.5px] text-amber-400 mt-1 block">BONN CODE (BAOAC)</span>
           </div>
 
           <div className="p-4 rounded-2xl bg-[#070c14]/92 border border-white/10 shadow-xl flex flex-col justify-between min-h-[115px]">
@@ -1439,7 +1494,7 @@ function DashboardApp() {
             <span className="text-xl sm:text-2xl font-black text-rose-400 mt-1 block">
               <CountUpNumber value={metrics.attributionConfidence} decimals={1} suffix="%" />
             </span>
-            <span className="text-[8.5px] text-rose-400 mt-1 block">BAYESIAN PROOF</span>
+            <span className="text-[8.5px] text-rose-400 mt-1 block">BAYESIAN EVIDENCE</span>
           </div>
 
           <div className="p-4 rounded-2xl bg-[#070c14]/92 border border-white/10 shadow-xl flex flex-col justify-between min-h-[115px]">
@@ -1448,7 +1503,7 @@ function DashboardApp() {
               {activeScenario.driftVector ? activeScenario.driftVector.speedKts : 1.84} <span className="text-xs font-normal text-cyan-400">KTS</span>
             </span>
             <span className="text-[8.5px] text-cyan-300 mt-1 block">
-              {activeScenario.driftVector ? activeScenario.driftVector.angle : 225}° SW HYCOM
+              {activeScenario.driftVector ? activeScenario.driftVector.angle : 225}° CMEMS / GFS
             </span>
           </div>
 

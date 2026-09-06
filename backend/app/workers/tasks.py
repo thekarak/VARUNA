@@ -539,32 +539,46 @@ def run_varuna_forensic_pipeline(
         upscaled_image_path = sr_out
 
     # 2. U-Net Segmentation & Slick Boundary Extraction
-    self.update_state(state="PROGRESS", meta={"step": "2/4", "detail": "Running U-Net segmentation & masking."})
+    self.update_state(state="PROGRESS", meta={"step": "2/4", "detail": "Running U-Net segmentation, contour extraction & age estimation."})
     segmentation_results = execute_unet_segmentation(upscaled_image_path, latitude, longitude)
 
-    # 3. Lagrangian Ocean/Atmospheric Hindcasting
-    self.update_state(state="PROGRESS", meta={"step": "3/4", "detail": "Executing physical Lagrangian hindcasting."})
+    # 3. Lagrangian Ocean/Atmospheric Hindcasting & Forward Forecasting
+    self.update_state(state="PROGRESS", meta={"step": "3/4", "detail": "Executing physical Lagrangian hindcasting & forecasting."})
     try:
         dt_parsed = datetime.datetime.fromisoformat(detection_time.replace("Z", "+00:00"))
     except Exception:
         dt_parsed = datetime.datetime.now(datetime.timezone.utc)
 
-    origin_point, trajectory, env_data = run_drift_hindcast(latitude, longitude, dt_parsed, simulation_hours=12)
+    # Use physically estimated spill age for simulation hours (clamped between 4 and 24 hours)
+    sim_hours = int(min(24, max(4, round(segmentation_results.get("spill_age_hours", 12.0)))))
+    origin_point, trajectory, env_data = run_drift_hindcast(latitude, longitude, dt_parsed, simulation_hours=sim_hours)
 
-    # 4. Spatio-Temporal Correlation & Regional Suspect Identification
-    self.update_state(state="PROGRESS", meta={"step": "4/4", "detail": "Correlating with PostGIS historical trajectories."})
-    time_of_discharge = (dt_parsed - datetime.timedelta(hours=12)).isoformat()
-    vessels_scored = build_suspect_vessel_profiles(
+    # 4. Spatio-Temporal Correlation & Regional Suspect Identification from Real AIS Database
+    self.update_state(state="PROGRESS", meta={"step": "4/4", "detail": "Querying AIS trajectory database & calculating CPA/blackout anomalies."})
+    time_of_discharge = (dt_parsed - datetime.timedelta(hours=sim_hours)).isoformat()
+    
+    from backend.app.services.ais_service import query_and_score_ais_vessels
+    vessels_scored = query_and_score_ais_vessels(
         origin_lat=origin_point[0],
         origin_lon=origin_point[1],
-        orig_time=dt_parsed - datetime.timedelta(hours=12),
-        env_data=env_data
+        discharge_time=dt_parsed - datetime.timedelta(hours=sim_hours)
     )
+
+    if not vessels_scored:
+        # Fallback to local sector generator if no AIS records matched
+        vessels_scored = build_suspect_vessel_profiles(
+            origin_lat=origin_point[0],
+            origin_lon=origin_point[1],
+            orig_time=dt_parsed - datetime.timedelta(hours=sim_hours),
+            env_data=env_data
+        )
 
     return {
         "status": "COMPLETED",
         "spill_area_sq_m": segmentation_results["area_sq_m"],
         "spill_perimeter_m": segmentation_results["perimeter_m"],
+        "spill_age_hours": segmentation_results.get("spill_age_hours", 12.0),
+        "weathering_stage": segmentation_results.get("weathering_stage", "Active Dispersion"),
         "slick_percentage": segmentation_results["slick_percentage"],
         "confidence_score": segmentation_results["confidence_score"],
         "estimated_volume_bbls": segmentation_results["estimated_volume_bbls"],
@@ -580,5 +594,6 @@ def run_varuna_forensic_pipeline(
         },
         "environmental_forcing": env_data,
         "drift_trajectory": trajectory,
+        "forecast_trajectory": env_data.get("forecast_trajectory", []),
         "vessels_scored": vessels_scored,
     }
