@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["python311", "gcc"]
+nixPkgs = ["python311", "gcc", "postgresql"]
 
 [phases.install]
 cmds = ["pip install --upgrade pip", "pip install -r requirements.txt"]
