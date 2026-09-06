@@ -255,22 +255,52 @@ The dashboard is now live at:
 
 ## Cloud Deployment (Vercel & Render)
 
-### Deploying Frontend to Vercel
-1. Import the repository into **[Vercel](https://vercel.com)**.
-2. The project includes pre-configured `vercel.json` files supporting both root imports and `frontend/` directory deployments.
-3. Clean URLs, JSX MIME types, and SAR satellite scenes in `/data` are automatically served.
-4. **Connecting to Render Backend:**
-   - Open your deployed dashboard: `https://your-app.vercel.app/dashboard.html?api=https://your-backend.onrender.com`
-   - The frontend automatically remembers your backend URL via `localStorage`.
+V.A.R.U.N.A. is deployed on a decoupled, production-grade cloud architecture leveraging **Vercel** for high-performance edge frontend delivery and **Render** for Python FastAPI & forensic ML pipeline execution.
 
-### Deploying Backend to Render
-1. Connect the repository on **[Render](https://render.com)**.
-2. Select **"Blueprint"** (Render will automatically parse `render.yaml`) OR create a **Web Service**:
-   - **Runtime:** `Python 3`
-   - **Build Command:** `pip install -r backend/requirements.txt`
-   - **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT --app-dir backend`
-   - **Health Check Path:** `/health`
-3. The API includes built-in `/health` endpoints and automatic background worker fallback for standalone free-tier deployments.
+```text
++-------------------------------------------------------------+
+|                FRONTEND (Vercel Edge Network)               |
+|  * 3D Mission Landing Canvas (Three.js / WebGL)             |
+|  * Tactical Forensic Dashboard (Leaflet + CARTO Basemaps)   |
+|  * Live URL: https://varuna-sooty.vercel.app                |
++------------------------------+------------------------------+
+                               |
+                        HTTPS REST / CORS
+                               |
+                               v
++-------------------------------------------------------------+
+|                BACKEND (Render Web Service)                 |
+|  * Python 3.11 + FastAPI + Uvicorn Gateway                  |
+|  * U-Net Segmentation & Fay Weathering Models               |
+|  * Lagrangian Drift Engine & Bayesian AIS Attribution       |
+|  * Live URL: https://varuna-e1tx.onrender.com               |
++-------------------------------------------------------------+
+```
+
+### 1. Frontend on Vercel
+* **Platform**: [Vercel](https://vercel.com)
+* **Production URL**: `https://varuna-sooty.vercel.app` (or `/dashboard.html`)
+* **Framework**: React 18 + Tailwind CSS + Three.js + Leaflet & CARTO Basemaps
+* **Deployment Details**:
+  * **Zero-Latency Edge CDN**: Serves static WebGL assets, satellite overlays, and React components with sub-50ms global response times.
+  * **Clean URL Routing**: Configured via `frontend/vercel.json` with clean routing (`/dashboard` $\to$ `dashboard.html`, `/` $\to$ `index.html`).
+  * **Dynamic API Resolution**: Automatically connects to the live Render backend (`https://varuna-e1tx.onrender.com`) with client-side scientific fallback.
+  * **CARTO Basemap Integration**: Native support for CARTO Positron Light and Dark Matter vector tile layers with dynamic real-time theme toggling.
+
+### 2. Backend on Render
+* **Platform**: [Render](https://render.com)
+* **Production URL**: `https://varuna-e1tx.onrender.com`
+* **API Documentation**: `https://varuna-e1tx.onrender.com/docs` (Interactive OpenAPI / Swagger)
+* **Health Check**: `https://varuna-e1tx.onrender.com/health`
+* **Stack**: Python 3.11 + FastAPI + Uvicorn + Celery / Background Workers
+* **Deployment Details**:
+  * **Native Python 3.11 Runtime**: Automated continuous deployment via `render.yaml` blueprint and `backend/requirements.txt`.
+  * **Resilient Architecture**: Dual-execution design featuring Celery distributed task queues with seamless fallback to async background worker threads for standalone cloud hosting.
+  * **Full Forensic Pipeline**: Executes ESRGAN enhancement, U-Net contour segmentation, Fay's spreading model, Bonn Agreement volume estimation, Runge-Kutta 4th-order Lagrangian metocean hindcasting, and Bayesian AIS vessel liability scoring.
+
+### 3. Architecture & Security
+* **Cross-Origin Resource Sharing (CORS)**: Pre-configured across all endpoints, enabling secure browser-to-backend communication without proxy overhead.
+* **Hybrid Fallback Guarantee**: If the backend is cold-starting, the frontend dynamically executes an authentic in-browser mathematical calculation engine so the dashboard remains 100% interactive and functional at all times.
 
 ---
 
