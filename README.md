@@ -279,7 +279,7 @@ V.A.R.U.N.A. is deployed on a decoupled, production-grade cloud architecture lev
 
 ### 1. Frontend on Vercel
 * **Platform**: [Vercel](https://vercel.com)
-* **Production URL**: `https://varuna-sooty.vercel.app` (or `/dashboard.html`)
+* **Production URL**: `https://varuna-omega.vercel.app/` (or `/dashboard.html`)
 * **Framework**: React 18 + Tailwind CSS + Three.js + Leaflet & CARTO Basemaps
 * **Deployment Details**:
   * **Zero-Latency Edge CDN**: Serves static WebGL assets, satellite overlays, and React components with sub-50ms global response times.
