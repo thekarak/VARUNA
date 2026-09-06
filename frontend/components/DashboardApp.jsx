@@ -1472,7 +1472,7 @@ function DashboardApp() {
           </div>
         </section>
 
-        <section className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 font-mono">
+        <section className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-5 xl:grid-cols-10 gap-3 font-mono">
           <div className="p-4 rounded-2xl bg-[#070c14]/92 border border-white/10 shadow-xl flex flex-col justify-between min-h-[115px]">
             <span className="text-[9px] text-slate-400 uppercase tracking-widest block font-semibold">OIL SLICK AREA</span>
             <span className="text-xl sm:text-2xl font-black text-white mt-1 block">
@@ -1521,6 +1521,25 @@ function DashboardApp() {
               <CountUpNumber value={metrics.attributionConfidence} decimals={1} suffix="%" />
             </span>
             <span className="text-[8.5px] text-rose-400 mt-1 block">BAYESIAN EVIDENCE</span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-[#070c14]/92 border border-white/10 shadow-xl flex flex-col justify-between min-h-[115px]">
+            <span className="text-[9px] text-slate-400 uppercase tracking-widest block font-semibold">SPILL AGE</span>
+            <span className="text-xl sm:text-2xl font-black text-amber-300 mt-1 block">
+              <CountUpNumber value={metrics.spillAgeHours || activeScenario.driftVector?.durationHours || 14.2} decimals={1} />
+              {" "}<span className="text-xs font-normal text-amber-400">HRS</span>
+            </span>
+            <span className="text-[8.5px] text-amber-400 mt-1 block">FAY SPREADING MODEL</span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-[#070c14]/92 border border-white/10 shadow-xl flex flex-col justify-between min-h-[115px]">
+            <span className="text-[9px] text-slate-400 uppercase tracking-widest block font-semibold">WEATHERING</span>
+            <span className="text-sm font-black text-rose-300 mt-1 block leading-tight">
+              {(metrics.weatheringStage || "Evaporating").split(" / ")[0]}
+            </span>
+            <span className="text-[8.5px] text-rose-400 mt-1 block">
+              {(metrics.weatheringStage || "Evaporating / Spreading").split(" / ")[1] || "Spreading"}
+            </span>
           </div>
 
           <div className="p-4 rounded-2xl bg-[#070c14]/92 border border-white/10 shadow-xl flex flex-col justify-between min-h-[115px]">
