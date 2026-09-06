@@ -307,6 +307,8 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const layerGroupRef = useRef(null);
+  const tileLayerRef = useRef(null);
+  const [mapTheme, setMapTheme] = useState("light"); // Light mode default
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -319,17 +321,6 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
       attributionControl: false
     });
 
-    const cartoKey = window.CARTO_API_KEY || "cb1_2vlt_1_8a2a2b183412e738d2fe8ff8";
-    const tileUrl = cartoKey
-      ? `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=${cartoKey}`
-      : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
-
-    L.tileLayer(tileUrl, {
-      subdomains: "abcd",
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
-    }).addTo(map);
-
     L.control.zoom({ position: "topright" }).addTo(map);
 
     const layerGroup = L.layerGroup().addTo(map);
@@ -340,8 +331,33 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
       map.remove();
       mapInstanceRef.current = null;
       layerGroupRef.current = null;
+      tileLayerRef.current = null;
     };
   }, []);
+
+  // Update tile layer whenever mapTheme changes (Light mode Positron vs Dark Matter)
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (tileLayerRef.current) {
+      map.removeLayer(tileLayerRef.current);
+    }
+
+    const cartoKey = window.CARTO_API_KEY || "cb1_2vlt_1_8a2a2b183412e738d2fe8ff8";
+    const basemapSubpath = mapTheme === "dark" ? "dark_all" : "light_all";
+    const tileUrl = cartoKey
+      ? `https://{s}.basemaps.cartocdn.com/${basemapSubpath}/{z}/{x}/{y}{r}.png?key=${cartoKey}`
+      : `https://{s}.basemaps.cartocdn.com/${basemapSubpath}/{z}/{x}/{y}{r}.png`;
+
+    const tileLayer = L.tileLayer(tileUrl, {
+      subdomains: "abcd",
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+    }).addTo(map);
+
+    tileLayerRef.current = tileLayer;
+  }, [mapTheme]);
 
   useEffect(() => {
     const map = mapInstanceRef.current;
@@ -354,12 +370,14 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
       easeLinearity: 0.25
     });
 
+    const isLight = mapTheme === "light";
+
     if (activeScenario.slickPolygon && activeScenario.slickPolygon.length > 0) {
       const polygon = L.polygon(activeScenario.slickPolygon, {
-        color: "#4ee7ff",
-        weight: 2,
-        fillColor: "#06b6d4",
-        fillOpacity: 0.3,
+        color: isLight ? "#0284c7" : "#4ee7ff",
+        weight: 2.5,
+        fillColor: isLight ? "#0284c7" : "#06b6d4",
+        fillOpacity: isLight ? 0.35 : 0.3,
         dashArray: "4, 4"
       }).addTo(layerGroup);
 
@@ -374,8 +392,8 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
       const originIcon = L.divIcon({
         className: "custom-origin-icon",
         html: `<div class="relative flex items-center justify-center">
-                 <div class="absolute w-9 h-9 rounded-full bg-emerald-400/25 pulse-ring-anim"></div>
-                 <div class="w-4 h-4 rounded-full bg-emerald-400 border-2 border-white shadow-[0_0_14px_#34d399]"></div>
+                 <div class="absolute w-9 h-9 rounded-full bg-emerald-500/25 pulse-ring-anim"></div>
+                 <div class="w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-[0_0_14px_#10b981]"></div>
                </div>`,
         iconSize: [28, 28],
         iconAnchor: [14, 14]
@@ -395,8 +413,8 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
         [activeScenario.lat, activeScenario.lng],
         [activeScenario.originCoord.lat, activeScenario.originCoord.lng]
       ], {
-        color: "#34d399",
-        weight: 2,
+        color: isLight ? "#059669" : "#34d399",
+        weight: 2.5,
         dashArray: "6, 6"
       }).addTo(layerGroup);
     }
@@ -406,10 +424,10 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
     if (forecastPts && forecastPts.length > 0) {
       const latlngs = forecastPts.map((p) => (Array.isArray(p) ? p : [p.lat, p.lon !== undefined ? p.lon : p.lng]));
       const forecastLine = L.polyline(latlngs, {
-        color: "#f59e0b",
-        weight: 2.5,
+        color: isLight ? "#d97706" : "#f59e0b",
+        weight: 3,
         dashArray: "6, 6",
-        opacity: 0.9
+        opacity: 0.95
       }).addTo(layerGroup);
 
       forecastLine.bindTooltip("FORWARD DRIFT FORECAST (+24H CMEMS / GFS)", {
@@ -422,8 +440,8 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
       const forecastEndIcon = L.divIcon({
         className: "custom-forecast-icon",
         html: `<div class="relative flex items-center justify-center">
-                 <div class="absolute w-7 h-7 rounded-full bg-amber-400/30 animate-ping"></div>
-                 <div class="w-3.5 h-3.5 rounded-full bg-amber-400 border-2 border-white shadow-[0_0_12px_#f59e0b]"></div>
+                 <div class="absolute w-7 h-7 rounded-full bg-amber-500/30 animate-ping"></div>
+                 <div class="w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white shadow-[0_0_12px_#d97706]"></div>
                </div>`,
         iconSize: [22, 22],
         iconAnchor: [11, 11]
@@ -450,9 +468,9 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
 
       if (trackPoints.length > 0) {
         L.polyline(trackPoints, {
-          color: isPrimary ? "#38bdf8" : "#64748b",
-          weight: isSelected ? 3 : 1.5,
-          opacity: isSelected ? 0.9 : 0.4
+          color: isPrimary ? (isLight ? "#0284c7" : "#38bdf8") : (isLight ? "#64748b" : "#94a3b8"),
+          weight: isSelected ? 3.5 : 2,
+          opacity: isSelected ? 0.95 : 0.6
         }).addTo(layerGroup);
       }
 
@@ -464,10 +482,10 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
 
       if (blackoutPoints.length > 0) {
         const blackoutLine = L.polyline(blackoutPoints, {
-          color: "#f43f5e",
-          weight: isSelected ? 3.5 : 2.5,
+          color: isLight ? "#dc2626" : "#f43f5e",
+          weight: isSelected ? 4 : 2.5,
           dashArray: "5, 5",
-          opacity: 0.9
+          opacity: 0.95
         }).addTo(layerGroup);
 
         blackoutLine.bindTooltip("AIS BLACKOUT VOID // " + (vessel.blackoutDurationHours || "GAP") + "H", {
@@ -482,7 +500,7 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
         const vIcon = L.divIcon({
           className: "custom-vessel-icon",
           html: `<div class="relative flex items-center justify-center cursor-pointer">
-                   <div class="w-3.5 h-3.5 rounded-full ${isPrimary ? "bg-rose-500 shadow-[0_0_12px_#f43f5e]" : "bg-cyan-400 shadow-[0_0_8px_#22d3ee]"} border border-white"></div>
+                   <div class="w-3.5 h-3.5 rounded-full ${isPrimary ? "bg-rose-500 shadow-[0_0_12px_#f43f5e]" : "bg-cyan-500 shadow-[0_0_8px_#06b6d4]"} border-2 border-white"></div>
                  </div>`,
           iconSize: [20, 20],
           iconAnchor: [10, 10]
@@ -499,10 +517,10 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
         });
       }
     });
-  }, [activeScenario, vessels, selectedVessel]);
+  }, [activeScenario, vessels, selectedVessel, mapTheme]);
 
   return (
-    <div className="relative w-full h-[580px] lg:h-[650px] rounded-2xl overflow-hidden border border-white/10 bg-[#04070d] shadow-2xl">
+    <div className={`relative w-full h-[580px] lg:h-[650px] rounded-2xl overflow-hidden border border-white/10 ${mapTheme === "light" ? "bg-[#e2e8f0]" : "bg-[#04070d]"} shadow-2xl transition-colors duration-300`}>
       <div ref={mapContainerRef} className="w-full h-full z-10" />
 
       <div className="absolute top-4 left-4 z-20 pointer-events-auto bg-[#070c14]/92 backdrop-blur-xl border border-cyan-500/30 rounded-xl p-3.5 shadow-2xl font-mono text-[10px] space-y-2 max-w-[220px]">
@@ -533,6 +551,13 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
       </div>
 
       <div className="absolute top-4 right-14 z-20 pointer-events-auto flex items-center gap-2">
+        <button
+          onClick={() => setMapTheme(mapTheme === "light" ? "dark" : "light")}
+          className="px-3 py-2 rounded-xl bg-[#070c14]/92 hover:bg-[#0f172a] border border-cyan-500/40 text-cyan-300 font-mono text-[10px] font-bold uppercase tracking-wider shadow-lg flex items-center gap-1.5 transition-all cursor-pointer backdrop-blur-md active:scale-95"
+          title="Toggle Map Basemap (Light Mode / Dark Mode)"
+        >
+          <span>{mapTheme === "light" ? "☀️ LIGHT MODE" : "🌙 DARK MODE"}</span>
+        </button>
         <button
           onClick={onAlertCoastGuard}
           className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-black font-mono text-[10px] font-extrabold uppercase tracking-wider shadow-[0_0_20px_rgba(244,63,94,0.4)] flex items-center gap-2 transition-all cursor-pointer active:scale-95"
