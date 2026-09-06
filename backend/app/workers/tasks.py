@@ -16,6 +16,20 @@ for _candidate in (_curr.parents[3], _curr.parents[2], _curr.parents[3] / "ml_pi
 from app.workers.celery_app import celery_app
 
 
+def _progress(task_self, step: str, detail: str) -> None:
+    """Best-effort Celery PROGRESS update.
+
+    The Redis result backend may be unavailable (local/demo mode without
+    Redis, e.g. Render/Vercel). update_state() would then raise a
+    ConnectionError and kill the whole pipeline, so failures here are
+    swallowed deliberately — the pipeline result is what matters.
+    """
+    try:
+        task_self.update_state(state="PROGRESS", meta={"step": step, "detail": detail})
+    except Exception:
+        pass
+
+
 def haversine_meters(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """Calculates distance between two coordinates in meters."""
     R = 6371000.0  # Earth radius in meters
@@ -534,7 +548,7 @@ def run_varuna_forensic_pipeline(
     from ml_pipeline.drift_engine.lagrangian_simulator import run_drift_hindcast
 
     # 1. Super-resolution
-    self.update_state(state="PROGRESS", meta={"step": "1/4", "detail": "Executing 4x ESRGAN Super-Resolution."})
+    _progress(self, "1/4", "Executing 4x ESRGAN Super-Resolution.")
     sr_out = execute_super_resolution(image_url)
     if isinstance(sr_out, dict):
         upscaled_image_path = sr_out.get("upscaled_image_path", image_url)
@@ -542,11 +556,11 @@ def run_varuna_forensic_pipeline(
         upscaled_image_path = sr_out
 
     # 2. U-Net Segmentation & Slick Boundary Extraction
-    self.update_state(state="PROGRESS", meta={"step": "2/4", "detail": "Running U-Net segmentation, contour extraction & age estimation."})
+    _progress(self, "2/4", "Running U-Net segmentation, contour extraction & age estimation.")
     segmentation_results = execute_unet_segmentation(upscaled_image_path, latitude, longitude)
 
     # 3. Lagrangian Ocean/Atmospheric Hindcasting & Forward Forecasting
-    self.update_state(state="PROGRESS", meta={"step": "3/4", "detail": "Executing physical Lagrangian hindcasting & forecasting."})
+    _progress(self, "3/4", "Executing physical Lagrangian hindcasting & forecasting.")
     try:
         dt_parsed = datetime.datetime.fromisoformat(detection_time.replace("Z", "+00:00"))
     except Exception:
@@ -557,18 +571,21 @@ def run_varuna_forensic_pipeline(
     origin_point, trajectory, env_data = run_drift_hindcast(latitude, longitude, dt_parsed, simulation_hours=sim_hours)
 
     # 4. Spatio-Temporal Correlation & Regional Suspect Identification from Real AIS Database
-    self.update_state(state="PROGRESS", meta={"step": "4/4", "detail": "Querying AIS trajectory database & calculating CPA/blackout anomalies."})
+    _progress(self, "4/4", "Querying AIS trajectory database & calculating CPA/blackout anomalies.")
     time_of_discharge = (dt_parsed - datetime.timedelta(hours=sim_hours)).isoformat()
     
     try:
         from app.services.ais_service import query_and_score_ais_vessels
     except ImportError:
         from backend.app.services.ais_service import query_and_score_ais_vessels
-    vessels_scored = query_and_score_ais_vessels(
-        origin_lat=origin_point[0],
-        origin_lon=origin_point[1],
-        discharge_time=dt_parsed - datetime.timedelta(hours=sim_hours)
-    )
+    try:
+        vessels_scored = query_and_score_ais_vessels(
+            origin_lat=origin_point[0],
+            origin_lon=origin_point[1],
+            discharge_time=dt_parsed - datetime.timedelta(hours=sim_hours)
+        )
+    except Exception:
+        vessels_scored = []
 
     if not vessels_scored:
         # Fallback to local sector generator if no AIS records matched

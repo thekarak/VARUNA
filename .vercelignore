@@ -1,6 +1,12 @@
-backend/
-ml_pipeline/
+# NOTE: do NOT exclude backend/ or requirements.txt here.
+# Vercel's Python runtime needs backend/app/*.py to find the FastAPI
+# entrypoint (api/index.py -> backend/app/main.py) and needs
+# requirements.txt to install dependencies.
 scratch/
-render.yaml
+__pycache__/
+*.pyc
+node_modules/
+frontend/node_modules/
+.git/
 docker-compose.yml
-requirements.txt
+render.yaml

@@ -1,0 +1,5 @@
+# Declares the FastAPI entrypoint for Vercel's Python runtime.
+# (Vercel error fix: "No FastAPI entrypoint found. Set
+#  'tool.vercel.entrypoint' in pyproject.toml ...")
+[tool.vercel]
+entrypoint = "api/index.py"

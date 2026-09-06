@@ -1,8 +1,10 @@
 import os
 import uuid
 import datetime
+import socket
 import threading
 from typing import Dict, Any, Optional
+from urllib.parse import urlparse
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -47,19 +49,76 @@ def _find_static_dir(dirname: str) -> Optional[str]:
     return None
 
 
-# Mount static subdirectories (components, services, data)
+# Mount static subdirectories (components, services, data).
+# Guarded so a missing directory can never crash the process at boot
+# (StaticFiles raises RuntimeError for non-existent directories, which
+#  on Render/Vercel surfaces as "Exited with status 3").
 for _d in ["components", "services", "data"]:
-    _dp = _find_static_dir(_d)
-    if _dp:
-        app.mount(f"/{_d}", StaticFiles(directory=_dp), name=_d)
+    try:
+        _dp = _find_static_dir(_d)
+        if _dp:
+            app.mount(f"/{_d}", StaticFiles(directory=_dp), name=_d)
+    except Exception:
+        pass
 
 # Mount frontend directory if present
-if os.path.exists(_frontend_dir) and os.path.isdir(_frontend_dir):
-    app.mount("/frontend", StaticFiles(directory=_frontend_dir, html=True), name="frontend")
+try:
+    if os.path.exists(_frontend_dir) and os.path.isdir(_frontend_dir):
+        app.mount("/frontend", StaticFiles(directory=_frontend_dir, html=True), name="frontend")
+except Exception:
+    pass
 
 
 # In-memory storage for tasks when Redis / Celery broker is not active
 LOCAL_TASK_STORE: Dict[str, Dict[str, Any]] = {}
+
+
+def _json_safe(value):
+    """Coerce an arbitrary task result into JSON-serializable data.
+
+    Celery failure results are exception instances, which pydantic cannot
+    serialize (500 Internal Server Error). Anything non-serializable becomes
+    a small ``{"error": ...}`` dict instead of crashing the endpoint.
+    """
+    import json
+    try:
+        json.dumps(value)
+        return value
+    except Exception:
+        pass
+    try:
+        from fastapi.encoders import jsonable_encoder
+        safe = jsonable_encoder(value)
+        json.dumps(safe)
+        return safe
+    except Exception:
+        pass
+    if isinstance(value, BaseException):
+        return {"error": f"{type(value).__name__}: {value}"}
+    return {"value": str(value)[:2000]}
+
+
+def _broker_reachable(timeout: float = 2.0) -> bool:
+    """Quick TCP check for the Celery/Redis broker.
+
+    Celery's publish path retries broker connections (effectively forever by
+    default), so calling ``task.delay()`` with Redis down hangs the request
+    until the platform kills it. On Render/Vercel there is no Redis, so probe
+    the broker first and use the local background thread instead.
+    """
+    try:
+        from app.workers.celery_app import celery_app
+        url = celery_app.conf.broker_url or os.getenv("REDIS_URL", "")
+        parts = urlparse(url)
+        if parts.scheme not in ("redis", "rediss"):
+            return True  # Non-Redis broker: let Celery handle errors itself.
+        host = parts.hostname or "localhost"
+        port = parts.port or 6379
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except Exception:
+        return False
+    return False
 
 
 def _execute_pipeline_in_background(task_id: str, image_url: str, lat: float, lon: float, dt_iso: str):
@@ -79,10 +138,12 @@ def _execute_pipeline_in_background(task_id: str, image_url: str, lat: float, lo
                 "detection_time": dt_iso
             }
         )
+        if getattr(eager_res, "failed", lambda: False)():
+            raise eager_res.result if isinstance(eager_res.result, BaseException) else RuntimeError(str(eager_res.result))
         LOCAL_TASK_STORE[task_id] = {
             "status": "SUCCESS",
             "message": "VARUNA Forensic Analysis completed successfully.",
-            "result": eager_res.result
+            "result": _json_safe(eager_res.result)
         }
     except Exception as exc:
         LOCAL_TASK_STORE[task_id] = {
@@ -167,36 +228,41 @@ def start_forensic_pipeline(request: SpillAnalysisRequest):
 
     dt_str = request.detection_time.isoformat()
 
-    try:
-        task = run_varuna_forensic_pipeline.delay(
-            image_url=request.image_url,
-            latitude=request.latitude,
-            longitude=request.longitude,
-            detection_time=dt_str
-        )
-        return {
-            "task_id": task.id,
-            "status": "QUEUED",
-            "message": "VARUNA processing pipeline initiated via Celery worker."
-        }
-    except Exception:
-        task_id = str(uuid.uuid4())
-        LOCAL_TASK_STORE[task_id] = {
-            "status": "QUEUED",
-            "message": "VARUNA processing pipeline queued in local background thread.",
-            "result": None
-        }
-        thread = threading.Thread(
-            target=_execute_pipeline_in_background,
-            args=(task_id, request.image_url, request.latitude, request.longitude, dt_str),
-            daemon=True
-        )
-        thread.start()
-        return {
-            "task_id": task_id,
-            "status": "QUEUED",
-            "message": "VARUNA processing pipeline initiated via background worker."
-        }
+    # Only use Celery when the broker is actually reachable; otherwise
+    # .delay() would block on connection retries until platform timeout.
+    if _broker_reachable():
+        try:
+            task = run_varuna_forensic_pipeline.delay(
+                image_url=request.image_url,
+                latitude=request.latitude,
+                longitude=request.longitude,
+                detection_time=dt_str
+            )
+            return {
+                "task_id": task.id,
+                "status": "QUEUED",
+                "message": "VARUNA processing pipeline initiated via Celery worker."
+            }
+        except Exception:
+            pass
+    # Local background-thread fallback (no Redis, or Celery publish failed).
+    task_id = str(uuid.uuid4())
+    LOCAL_TASK_STORE[task_id] = {
+        "status": "QUEUED",
+        "message": "VARUNA processing pipeline queued in local background thread.",
+        "result": None
+    }
+    thread = threading.Thread(
+        target=_execute_pipeline_in_background,
+        args=(task_id, request.image_url, request.latitude, request.longitude, dt_str),
+        daemon=True
+    )
+    thread.start()
+    return {
+        "task_id": task_id,
+        "status": "QUEUED",
+        "message": "VARUNA processing pipeline initiated via background worker."
+    }
 
 
 @app.get("/api/v1/task/{task_id}", response_model=AnalysisStatusResponse)
@@ -209,8 +275,18 @@ def get_pipeline_status(task_id: str):
         return {
             "task_id": task_id,
             "status": entry.get("status", "PENDING"),
-            "result": entry.get("result"),
+            "result": _json_safe(entry.get("result")),
             "message": entry.get("message", "Task in progress")
+        }
+
+    # Unknown locally and broker unreachable: answer immediately instead of
+    # blocking on Celery result-backend connection retries.
+    if not _broker_reachable():
+        return {
+            "task_id": task_id,
+            "status": "UNKNOWN",
+            "result": None,
+            "message": "Task not found locally and Celery result backend is unavailable."
         }
 
     try:
@@ -224,7 +300,7 @@ def get_pipeline_status(task_id: str):
             safe_result = {"error": f"{type(raw).__name__}: {raw}"}
             message = "Task failed - see result.error"
         elif isinstance(raw, dict):
-            safe_result = raw
+            safe_result = _json_safe(raw)
             message = "Query completed successfully"
         elif raw is None:
             safe_result = None
