@@ -1,15 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
+  "outputDirectory": "frontend",
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://varuna-e1tx.onrender.com/api/:path*" },
     { "source": "/docs", "destination": "https://varuna-e1tx.onrender.com/docs" },
     { "source": "/openapi.json", "destination": "https://varuna-e1tx.onrender.com/openapi.json" },
-    { "source": "/dashboard", "destination": "/frontend/dashboard.html" },
-    { "source": "/dashboard.html", "destination": "/frontend/dashboard.html" },
-    { "source": "/", "destination": "/frontend/index.html" },
-    { "source": "/index.html", "destination": "/frontend/index.html" },
-    { "source": "/(.*)", "destination": "/frontend/$1" }
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/", "destination": "/index.html" }
   ],
   "headers": [
     {

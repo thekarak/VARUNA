@@ -1,0 +1,10 @@
+{
+  "name": "varuna-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "V.A.R.U.N.A Forensic Operations Frontend & Dashboard",
+  "scripts": {
+    "build": "echo 'Static assets ready in frontend/'",
+    "start": "node frontend/server.js"
+  }
+}
