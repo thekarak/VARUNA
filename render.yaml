@@ -1,0 +1,30 @@
+services:
+  # V.A.R.U.N.A FastAPI ML & Forensic Backend
+  - type: web
+    name: varuna-backend
+    runtime: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --app-dir backend
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: PORT
+        value: 10000
+      - key: PYTHONPATH
+        value: .
+    healthCheckPath: /health
+    autoDeploy: true
+
+  # V.A.R.U.N.A Static Frontend (Render option)
+  - type: static
+    name: varuna-frontend
+    buildCommand: echo "Frontend static assets ready"
+    staticPublishPath: ./frontend
+    routes:
+      - type: rewrite
+        source: /dashboard
+        destination: /dashboard.html
+      - type: rewrite
+        source: /
+        destination: /index.html
+    autoDeploy: true

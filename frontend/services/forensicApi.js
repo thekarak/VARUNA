@@ -1,5 +1,19 @@
 const ForensicApi = {
-  API_BASE: "http://localhost:8000",
+  API_BASE: (function() {
+    if (typeof window === "undefined") return "http://localhost:8000";
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramApi = urlParams.get("api");
+      if (paramApi) {
+        window.localStorage.setItem("VARUNA_API_URL", paramApi);
+        return paramApi.replace(/\/+$/, "");
+      }
+      const storedApi = window.localStorage.getItem("VARUNA_API_URL");
+      if (storedApi) return storedApi.replace(/\/+$/, "");
+      if (window.VARUNA_API_URL) return window.VARUNA_API_URL.replace(/\/+$/, "");
+    } catch (e) {}
+    return "http://localhost:8000";
+  })(),
 
   getOperationalScenarios: function() {
     return new Promise((resolve) => {

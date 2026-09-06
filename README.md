@@ -253,6 +253,27 @@ The dashboard is now live at:
 
 ---
 
+## Cloud Deployment (Vercel & Render)
+
+### Deploying Frontend to Vercel
+1. Import the repository into **[Vercel](https://vercel.com)**.
+2. The project includes pre-configured `vercel.json` files supporting both root imports and `frontend/` directory deployments.
+3. Clean URLs, JSX MIME types, and SAR satellite scenes in `/data` are automatically served.
+4. **Connecting to Render Backend:**
+   - Open your deployed dashboard: `https://your-app.vercel.app/dashboard.html?api=https://your-backend.onrender.com`
+   - The frontend automatically remembers your backend URL via `localStorage`.
+
+### Deploying Backend to Render
+1. Connect the repository on **[Render](https://render.com)**.
+2. Select **"Blueprint"** (Render will automatically parse `render.yaml`) OR create a **Web Service**:
+   - **Runtime:** `Python 3`
+   - **Build Command:** `pip install -r backend/requirements.txt`
+   - **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT --app-dir backend`
+   - **Health Check Path:** `/health`
+3. The API includes built-in `/health` endpoints and automatic background worker fallback for standalone free-tier deployments.
+
+---
+
 ## API Endpoints Reference
 
 | Method | Endpoint | Description |

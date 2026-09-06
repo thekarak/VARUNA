@@ -1,0 +1,1663 @@
+[
+  {
+    "mmsi": 419992014,
+    "imo": 9238412,
+    "vessel_name": "Oceanic Sentinel (Dark Fleet)",
+    "vessel_type": "Aframax Crude Oil Tanker",
+    "flag": "Gabon 🇬🇦 / Shadow Fleet Registry",
+    "dwt": 114800,
+    "is_shadow_fleet": true,
+    "theater": "Arabian Sea",
+    "nominal_speed_kts": 14.8,
+    "discharge_speed_kts": 3.4,
+    "blackout_duration_hours": 2.75,
+    "cpa_actual_meters": 48.5,
+    "pings": [
+      {
+        "timestamp": "2026-09-05T15:19:32.471222+00:00",
+        "hour_rel": -24,
+        "lat": 21.18387,
+        "lon": 66.67636,
+        "sog_kts": 14.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T19:19:32.471222+00:00",
+        "hour_rel": -20,
+        "lat": 21.60078,
+        "lon": 67.64364,
+        "sog_kts": 14.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T22:19:32.471222+00:00",
+        "hour_rel": -17,
+        "lat": 21.91346,
+        "lon": 68.3691,
+        "sog_kts": 14.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T00:19:32.471222+00:00",
+        "hour_rel": -15,
+        "lat": 22.12192,
+        "lon": 68.85274,
+        "sog_kts": 14.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T01:49:32.471222+00:00",
+        "hour_rel": -13.5,
+        "lat": 22.27826,
+        "lon": 69.21547,
+        "sog_kts": 3.4,
+        "cog_deg": 121.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T03:19:32.471222+00:00",
+        "hour_rel": -12,
+        "lat": 22.4346,
+        "lon": 69.5782,
+        "sog_kts": 3.4,
+        "cog_deg": 121.0,
+        "is_transponder_suppressed": true
+      },
+      {
+        "timestamp": "2026-09-06T04:49:32.471222+00:00",
+        "hour_rel": -10.5,
+        "lat": 22.59095,
+        "lon": 69.94093,
+        "sog_kts": 3.4,
+        "cog_deg": 121.0,
+        "is_transponder_suppressed": true
+      },
+      {
+        "timestamp": "2026-09-06T06:19:32.471222+00:00",
+        "hour_rel": -9,
+        "lat": 22.74729,
+        "lon": 70.30366,
+        "sog_kts": 14.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T08:19:32.471222+00:00",
+        "hour_rel": -7,
+        "lat": 22.95574,
+        "lon": 70.7873,
+        "sog_kts": 14.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T10:19:32.471222+00:00",
+        "hour_rel": -5,
+        "lat": 23.1642,
+        "lon": 71.27094,
+        "sog_kts": 14.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T12:19:32.471222+00:00",
+        "hour_rel": -3,
+        "lat": 23.37266,
+        "lon": 71.75458,
+        "sog_kts": 14.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T14:19:32.471222+00:00",
+        "hour_rel": -1,
+        "lat": 23.58111,
+        "lon": 72.23822,
+        "sog_kts": 14.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T15:19:32.471222+00:00",
+        "hour_rel": 0,
+        "lat": 23.68534,
+        "lon": 72.48004,
+        "sog_kts": 14.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T17:19:32.471222+00:00",
+        "hour_rel": 2,
+        "lat": 23.8938,
+        "lon": 72.96368,
+        "sog_kts": 14.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T19:19:32.471222+00:00",
+        "hour_rel": 4,
+        "lat": 24.10225,
+        "lon": 73.44732,
+        "sog_kts": 14.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      }
+    ]
+  },
+  {
+    "mmsi": 419072810,
+    "imo": 9324567,
+    "vessel_name": "MT Desh Shanti",
+    "vessel_type": "VLCC Crude Carrier",
+    "flag": "India 🇮🇳",
+    "dwt": 299900,
+    "is_shadow_fleet": false,
+    "theater": "Arabian Sea",
+    "nominal_speed_kts": 15.2,
+    "discharge_speed_kts": 4.6,
+    "blackout_duration_hours": 0.0,
+    "cpa_actual_meters": 472.0,
+    "pings": [
+      {
+        "timestamp": "2026-09-05T15:19:32.471222+00:00",
+        "hour_rel": -24,
+        "lat": 21.14661,
+        "lon": 66.59967,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T19:19:32.471222+00:00",
+        "hour_rel": -20,
+        "lat": 21.57479,
+        "lon": 67.59309,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T22:19:32.471222+00:00",
+        "hour_rel": -17,
+        "lat": 21.89593,
+        "lon": 68.33816,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T00:19:32.471222+00:00",
+        "hour_rel": -15,
+        "lat": 22.11002,
+        "lon": 68.83487,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T01:49:32.471222+00:00",
+        "hour_rel": -13.5,
+        "lat": 22.27058,
+        "lon": 69.20741,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T03:19:32.471222+00:00",
+        "hour_rel": -12,
+        "lat": 22.43115,
+        "lon": 69.57994,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T04:49:32.471222+00:00",
+        "hour_rel": -10.5,
+        "lat": 22.59172,
+        "lon": 69.95248,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T06:19:32.471222+00:00",
+        "hour_rel": -9,
+        "lat": 22.75229,
+        "lon": 70.32501,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T08:19:32.471222+00:00",
+        "hour_rel": -7,
+        "lat": 22.96638,
+        "lon": 70.82172,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T10:19:32.471222+00:00",
+        "hour_rel": -5,
+        "lat": 23.18047,
+        "lon": 71.31843,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T12:19:32.471222+00:00",
+        "hour_rel": -3,
+        "lat": 23.39456,
+        "lon": 71.81515,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T14:19:32.471222+00:00",
+        "hour_rel": -1,
+        "lat": 23.60865,
+        "lon": 72.31186,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T15:19:32.471222+00:00",
+        "hour_rel": 0,
+        "lat": 23.71569,
+        "lon": 72.56021,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T17:19:32.471222+00:00",
+        "hour_rel": 2,
+        "lat": 23.92978,
+        "lon": 73.05693,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T19:19:32.471222+00:00",
+        "hour_rel": 4,
+        "lat": 24.14387,
+        "lon": 73.55364,
+        "sog_kts": 15.2,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      }
+    ]
+  },
+  {
+    "mmsi": 352001844,
+    "imo": 9187342,
+    "vessel_name": "Al-Zubarah Star",
+    "vessel_type": "LNG Product Carrier",
+    "flag": "Panama 🇵🇦",
+    "dwt": 78500,
+    "is_shadow_fleet": false,
+    "theater": "Arabian Sea",
+    "nominal_speed_kts": 17.5,
+    "discharge_speed_kts": 17.2,
+    "blackout_duration_hours": 0.0,
+    "cpa_actual_meters": 3120.0,
+    "pings": [
+      {
+        "timestamp": "2026-09-05T15:19:32.471222+00:00",
+        "hour_rel": -24,
+        "lat": 20.93065,
+        "lon": 66.1596,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T19:19:32.471222+00:00",
+        "hour_rel": -20,
+        "lat": 21.42362,
+        "lon": 67.30335,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T22:19:32.471222+00:00",
+        "hour_rel": -17,
+        "lat": 21.79334,
+        "lon": 68.16115,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T00:19:32.471222+00:00",
+        "hour_rel": -15,
+        "lat": 22.03983,
+        "lon": 68.73303,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T01:49:32.471222+00:00",
+        "hour_rel": -13.5,
+        "lat": 22.22469,
+        "lon": 69.16193,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T03:19:32.471222+00:00",
+        "hour_rel": -12,
+        "lat": 22.40956,
+        "lon": 69.59084,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T04:49:32.471222+00:00",
+        "hour_rel": -10.5,
+        "lat": 22.59442,
+        "lon": 70.01974,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T06:19:32.471222+00:00",
+        "hour_rel": -9,
+        "lat": 22.77929,
+        "lon": 70.44864,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T08:19:32.471222+00:00",
+        "hour_rel": -7,
+        "lat": 23.02577,
+        "lon": 71.02052,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T10:19:32.471222+00:00",
+        "hour_rel": -5,
+        "lat": 23.27226,
+        "lon": 71.59239,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T12:19:32.471222+00:00",
+        "hour_rel": -3,
+        "lat": 23.51874,
+        "lon": 72.16426,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T14:19:32.471222+00:00",
+        "hour_rel": -1,
+        "lat": 23.76523,
+        "lon": 72.73613,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T15:19:32.471222+00:00",
+        "hour_rel": 0,
+        "lat": 23.88847,
+        "lon": 73.02207,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T17:19:32.471222+00:00",
+        "hour_rel": 2,
+        "lat": 24.13495,
+        "lon": 73.59394,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T19:19:32.471222+00:00",
+        "hour_rel": 4,
+        "lat": 24.38144,
+        "lon": 74.16582,
+        "sog_kts": 17.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      }
+    ]
+  },
+  {
+    "mmsi": 419001429,
+    "imo": 9123890,
+    "vessel_name": "MV Jag Radha",
+    "vessel_type": "Post-Panamax Bulk Carrier",
+    "flag": "India 🇮🇳",
+    "dwt": 82000,
+    "is_shadow_fleet": false,
+    "theater": "Arabian Sea",
+    "nominal_speed_kts": 13.8,
+    "discharge_speed_kts": 13.6,
+    "blackout_duration_hours": 0.0,
+    "cpa_actual_meters": 2150.0,
+    "pings": [
+      {
+        "timestamp": "2026-09-05T15:19:32.471222+00:00",
+        "hour_rel": -24,
+        "lat": 21.25124,
+        "lon": 66.88107,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T19:19:32.471222+00:00",
+        "hour_rel": -20,
+        "lat": 21.63998,
+        "lon": 67.783,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T22:19:32.471222+00:00",
+        "hour_rel": -17,
+        "lat": 21.93154,
+        "lon": 68.45944,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T00:19:32.471222+00:00",
+        "hour_rel": -15,
+        "lat": 22.12591,
+        "lon": 68.9104,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T01:49:32.471222+00:00",
+        "hour_rel": -13.5,
+        "lat": 22.27169,
+        "lon": 69.24862,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T03:19:32.471222+00:00",
+        "hour_rel": -12,
+        "lat": 22.41747,
+        "lon": 69.58685,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T04:49:32.471222+00:00",
+        "hour_rel": -10.5,
+        "lat": 22.56325,
+        "lon": 69.92507,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T06:19:32.471222+00:00",
+        "hour_rel": -9,
+        "lat": 22.70902,
+        "lon": 70.26329,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T08:19:32.471222+00:00",
+        "hour_rel": -7,
+        "lat": 22.9034,
+        "lon": 70.71425,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T10:19:32.471222+00:00",
+        "hour_rel": -5,
+        "lat": 23.09777,
+        "lon": 71.16521,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T12:19:32.471222+00:00",
+        "hour_rel": -3,
+        "lat": 23.29214,
+        "lon": 71.61618,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T14:19:32.471222+00:00",
+        "hour_rel": -1,
+        "lat": 23.48651,
+        "lon": 72.06714,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T15:19:32.471222+00:00",
+        "hour_rel": 0,
+        "lat": 23.58369,
+        "lon": 72.29262,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T17:19:32.471222+00:00",
+        "hour_rel": 2,
+        "lat": 23.77807,
+        "lon": 72.74358,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T19:19:32.471222+00:00",
+        "hour_rel": 4,
+        "lat": 23.97244,
+        "lon": 73.19454,
+        "sog_kts": 13.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      }
+    ]
+  },
+  {
+    "mmsi": 422091845,
+    "imo": 9355120,
+    "vessel_name": "Farvahar (Dark AIS)",
+    "vessel_type": "Suezmax Crude Oil Carrier",
+    "flag": "Iran 🇮🇷 / Shadow Fleet Transponder",
+    "dwt": 158000,
+    "is_shadow_fleet": true,
+    "theater": "Strait of Hormuz",
+    "nominal_speed_kts": 15.1,
+    "discharge_speed_kts": 3.1,
+    "blackout_duration_hours": 3.2,
+    "cpa_actual_meters": 58.0,
+    "pings": [
+      {
+        "timestamp": "2026-09-05T15:19:32.471222+00:00",
+        "hour_rel": -24,
+        "lat": 25.26544,
+        "lon": 53.23027,
+        "sog_kts": 15.1,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T19:19:32.471222+00:00",
+        "hour_rel": -20,
+        "lat": 25.6908,
+        "lon": 54.24993,
+        "sog_kts": 15.1,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T22:19:32.471222+00:00",
+        "hour_rel": -17,
+        "lat": 26.00982,
+        "lon": 55.01467,
+        "sog_kts": 15.1,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T00:19:32.471222+00:00",
+        "hour_rel": -15,
+        "lat": 26.2225,
+        "lon": 55.5245,
+        "sog_kts": 15.1,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T01:49:32.471222+00:00",
+        "hour_rel": -13.5,
+        "lat": 26.38202,
+        "lon": 55.90687,
+        "sog_kts": 3.1,
+        "cog_deg": 129.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T03:19:32.471222+00:00",
+        "hour_rel": -12,
+        "lat": 26.54153,
+        "lon": 56.28925,
+        "sog_kts": 3.1,
+        "cog_deg": 129.0,
+        "is_transponder_suppressed": true
+      },
+      {
+        "timestamp": "2026-09-06T04:49:32.471222+00:00",
+        "hour_rel": -10.5,
+        "lat": 26.70104,
+        "lon": 56.67162,
+        "sog_kts": 3.1,
+        "cog_deg": 129.0,
+        "is_transponder_suppressed": true
+      },
+      {
+        "timestamp": "2026-09-06T06:19:32.471222+00:00",
+        "hour_rel": -9,
+        "lat": 26.86055,
+        "lon": 57.05399,
+        "sog_kts": 15.1,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T08:19:32.471222+00:00",
+        "hour_rel": -7,
+        "lat": 27.07323,
+        "lon": 57.56382,
+        "sog_kts": 15.1,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T10:19:32.471222+00:00",
+        "hour_rel": -5,
+        "lat": 27.28591,
+        "lon": 58.07365,
+        "sog_kts": 15.1,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T12:19:32.471222+00:00",
+        "hour_rel": -3,
+        "lat": 27.49859,
+        "lon": 58.58348,
+        "sog_kts": 15.1,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T14:19:32.471222+00:00",
+        "hour_rel": -1,
+        "lat": 27.71128,
+        "lon": 59.09331,
+        "sog_kts": 15.1,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T15:19:32.471222+00:00",
+        "hour_rel": 0,
+        "lat": 27.81762,
+        "lon": 59.34822,
+        "sog_kts": 15.1,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T17:19:32.471222+00:00",
+        "hour_rel": 2,
+        "lat": 28.0303,
+        "lon": 59.85805,
+        "sog_kts": 15.1,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T19:19:32.471222+00:00",
+        "hour_rel": 4,
+        "lat": 28.24298,
+        "lon": 60.36788,
+        "sog_kts": 15.1,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      }
+    ]
+  },
+  {
+    "mmsi": 403219000,
+    "imo": 9400234,
+    "vessel_name": "Safaniyah Glory",
+    "vessel_type": "VLCC Crude Carrier",
+    "flag": "Saudi Arabia 🇸🇦",
+    "dwt": 318000,
+    "is_shadow_fleet": false,
+    "theater": "Strait of Hormuz",
+    "nominal_speed_kts": 14.9,
+    "discharge_speed_kts": 5.2,
+    "blackout_duration_hours": 0.0,
+    "cpa_actual_meters": 515.0,
+    "pings": [
+      {
+        "timestamp": "2026-09-05T15:19:32.471222+00:00",
+        "hour_rel": -24,
+        "lat": 25.27861,
+        "lon": 53.27273,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T19:19:32.471222+00:00",
+        "hour_rel": -20,
+        "lat": 25.69834,
+        "lon": 54.27888,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T22:19:32.471222+00:00",
+        "hour_rel": -17,
+        "lat": 26.01314,
+        "lon": 55.0335,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T00:19:32.471222+00:00",
+        "hour_rel": -15,
+        "lat": 26.223,
+        "lon": 55.53657,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T01:49:32.471222+00:00",
+        "hour_rel": -13.5,
+        "lat": 26.3804,
+        "lon": 55.91388,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T03:19:32.471222+00:00",
+        "hour_rel": -12,
+        "lat": 26.5378,
+        "lon": 56.29119,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T04:49:32.471222+00:00",
+        "hour_rel": -10.5,
+        "lat": 26.6952,
+        "lon": 56.6685,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T06:19:32.471222+00:00",
+        "hour_rel": -9,
+        "lat": 26.8526,
+        "lon": 57.0458,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T08:19:32.471222+00:00",
+        "hour_rel": -7,
+        "lat": 27.06246,
+        "lon": 57.54888,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T10:19:32.471222+00:00",
+        "hour_rel": -5,
+        "lat": 27.27233,
+        "lon": 58.05196,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T12:19:32.471222+00:00",
+        "hour_rel": -3,
+        "lat": 27.48219,
+        "lon": 58.55503,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T14:19:32.471222+00:00",
+        "hour_rel": -1,
+        "lat": 27.69206,
+        "lon": 59.05811,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T15:19:32.471222+00:00",
+        "hour_rel": 0,
+        "lat": 27.79699,
+        "lon": 59.30965,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T17:19:32.471222+00:00",
+        "hour_rel": 2,
+        "lat": 28.00685,
+        "lon": 59.81273,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T19:19:32.471222+00:00",
+        "hour_rel": 4,
+        "lat": 28.21672,
+        "lon": 60.3158,
+        "sog_kts": 14.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      }
+    ]
+  },
+  {
+    "mmsi": 636014529,
+    "imo": 9287340,
+    "vessel_name": "Falcon Chemist",
+    "vessel_type": "Chemical / Oil Products Tanker",
+    "flag": "Liberia 🇱🇷",
+    "dwt": 45000,
+    "is_shadow_fleet": false,
+    "theater": "Strait of Hormuz",
+    "nominal_speed_kts": 13.5,
+    "discharge_speed_kts": 13.2,
+    "blackout_duration_hours": 0.0,
+    "cpa_actual_meters": 1940.0,
+    "pings": [
+      {
+        "timestamp": "2026-09-05T15:19:32.471222+00:00",
+        "hour_rel": -24,
+        "lat": 25.38531,
+        "lon": 53.5624,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T19:19:32.471222+00:00",
+        "hour_rel": -20,
+        "lat": 25.7656,
+        "lon": 54.47402,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T22:19:32.471222+00:00",
+        "hour_rel": -17,
+        "lat": 26.05082,
+        "lon": 55.15773,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T00:19:32.471222+00:00",
+        "hour_rel": -15,
+        "lat": 26.24096,
+        "lon": 55.61353,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T01:49:32.471222+00:00",
+        "hour_rel": -13.5,
+        "lat": 26.38357,
+        "lon": 55.95539,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T03:19:32.471222+00:00",
+        "hour_rel": -12,
+        "lat": 26.52618,
+        "lon": 56.29725,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T04:49:32.471222+00:00",
+        "hour_rel": -10.5,
+        "lat": 26.66879,
+        "lon": 56.6391,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T06:19:32.471222+00:00",
+        "hour_rel": -9,
+        "lat": 26.8114,
+        "lon": 56.98096,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T08:19:32.471222+00:00",
+        "hour_rel": -7,
+        "lat": 27.00154,
+        "lon": 57.43677,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T10:19:32.471222+00:00",
+        "hour_rel": -5,
+        "lat": 27.19169,
+        "lon": 57.89257,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T12:19:32.471222+00:00",
+        "hour_rel": -3,
+        "lat": 27.38184,
+        "lon": 58.34838,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T14:19:32.471222+00:00",
+        "hour_rel": -1,
+        "lat": 27.57198,
+        "lon": 58.80419,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T15:19:32.471222+00:00",
+        "hour_rel": 0,
+        "lat": 27.66705,
+        "lon": 59.03209,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T17:19:32.471222+00:00",
+        "hour_rel": 2,
+        "lat": 27.8572,
+        "lon": 59.4879,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T19:19:32.471222+00:00",
+        "hour_rel": 4,
+        "lat": 28.04735,
+        "lon": 59.94371,
+        "sog_kts": 13.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      }
+    ]
+  },
+  {
+    "mmsi": 412093811,
+    "imo": 9198744,
+    "vessel_name": "Hai Fa 88 (Dark Fleet)",
+    "vessel_type": "Bunkering & Sludge Barge",
+    "flag": "Belize 🇧🇿 / Shadow Registry",
+    "dwt": 18500,
+    "is_shadow_fleet": true,
+    "theater": "Strait of Malacca",
+    "nominal_speed_kts": 12.8,
+    "discharge_speed_kts": 2.9,
+    "blackout_duration_hours": 2.5,
+    "cpa_actual_meters": 72.0,
+    "pings": [
+      {
+        "timestamp": "2026-09-05T15:19:32.471222+00:00",
+        "hour_rel": -24,
+        "lat": 1.1327,
+        "lon": 99.79079,
+        "sog_kts": 12.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T19:19:32.471222+00:00",
+        "hour_rel": -20,
+        "lat": 1.49327,
+        "lon": 100.56462,
+        "sog_kts": 12.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T22:19:32.471222+00:00",
+        "hour_rel": -17,
+        "lat": 1.7637,
+        "lon": 101.14499,
+        "sog_kts": 12.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T00:19:32.471222+00:00",
+        "hour_rel": -15,
+        "lat": 1.94398,
+        "lon": 101.5319,
+        "sog_kts": 12.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T01:49:32.471222+00:00",
+        "hour_rel": -13.5,
+        "lat": 2.0792,
+        "lon": 101.82209,
+        "sog_kts": 2.9,
+        "cog_deg": 113.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T03:19:32.471222+00:00",
+        "hour_rel": -12,
+        "lat": 2.21441,
+        "lon": 102.11227,
+        "sog_kts": 2.9,
+        "cog_deg": 113.0,
+        "is_transponder_suppressed": true
+      },
+      {
+        "timestamp": "2026-09-06T04:49:32.471222+00:00",
+        "hour_rel": -10.5,
+        "lat": 2.34963,
+        "lon": 102.40246,
+        "sog_kts": 2.9,
+        "cog_deg": 113.0,
+        "is_transponder_suppressed": true
+      },
+      {
+        "timestamp": "2026-09-06T06:19:32.471222+00:00",
+        "hour_rel": -9,
+        "lat": 2.48484,
+        "lon": 102.69265,
+        "sog_kts": 12.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T08:19:32.471222+00:00",
+        "hour_rel": -7,
+        "lat": 2.66513,
+        "lon": 103.07956,
+        "sog_kts": 12.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T10:19:32.471222+00:00",
+        "hour_rel": -5,
+        "lat": 2.84541,
+        "lon": 103.46647,
+        "sog_kts": 12.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T12:19:32.471222+00:00",
+        "hour_rel": -3,
+        "lat": 3.0257,
+        "lon": 103.85339,
+        "sog_kts": 12.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T14:19:32.471222+00:00",
+        "hour_rel": -1,
+        "lat": 3.20599,
+        "lon": 104.2403,
+        "sog_kts": 12.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T15:19:32.471222+00:00",
+        "hour_rel": 0,
+        "lat": 3.29613,
+        "lon": 104.43376,
+        "sog_kts": 12.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T17:19:32.471222+00:00",
+        "hour_rel": 2,
+        "lat": 3.47642,
+        "lon": 104.82067,
+        "sog_kts": 12.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T19:19:32.471222+00:00",
+        "hour_rel": 4,
+        "lat": 3.6567,
+        "lon": 105.20759,
+        "sog_kts": 12.8,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      }
+    ]
+  },
+  {
+    "mmsi": 563009210,
+    "imo": 9512390,
+    "vessel_name": "Singa Fortune",
+    "vessel_type": "VLCC Crude Carrier",
+    "flag": "Singapore 🇸🇬",
+    "dwt": 312000,
+    "is_shadow_fleet": false,
+    "theater": "Strait of Malacca",
+    "nominal_speed_kts": 15.6,
+    "discharge_speed_kts": 4.8,
+    "blackout_duration_hours": 0.0,
+    "cpa_actual_meters": 580.0,
+    "pings": [
+      {
+        "timestamp": "2026-09-05T15:19:32.471222+00:00",
+        "hour_rel": -24,
+        "lat": 0.89193,
+        "lon": 99.2849,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T19:19:32.471222+00:00",
+        "hour_rel": -20,
+        "lat": 1.33137,
+        "lon": 100.228,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T22:19:32.471222+00:00",
+        "hour_rel": -17,
+        "lat": 1.66096,
+        "lon": 100.93533,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T00:19:32.471222+00:00",
+        "hour_rel": -15,
+        "lat": 1.88068,
+        "lon": 101.40688,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T01:49:32.471222+00:00",
+        "hour_rel": -13.5,
+        "lat": 2.04548,
+        "lon": 101.76054,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T03:19:32.471222+00:00",
+        "hour_rel": -12,
+        "lat": 2.21027,
+        "lon": 102.11421,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T04:49:32.471222+00:00",
+        "hour_rel": -10.5,
+        "lat": 2.37506,
+        "lon": 102.46787,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T06:19:32.471222+00:00",
+        "hour_rel": -9,
+        "lat": 2.53986,
+        "lon": 102.82153,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T08:19:32.471222+00:00",
+        "hour_rel": -7,
+        "lat": 2.75958,
+        "lon": 103.29309,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T10:19:32.471222+00:00",
+        "hour_rel": -5,
+        "lat": 2.9793,
+        "lon": 103.76464,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T12:19:32.471222+00:00",
+        "hour_rel": -3,
+        "lat": 3.19903,
+        "lon": 104.23619,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T14:19:32.471222+00:00",
+        "hour_rel": -1,
+        "lat": 3.41875,
+        "lon": 104.70774,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T15:19:32.471222+00:00",
+        "hour_rel": 0,
+        "lat": 3.52861,
+        "lon": 104.94352,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T17:19:32.471222+00:00",
+        "hour_rel": 2,
+        "lat": 3.74834,
+        "lon": 105.41507,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T19:19:32.471222+00:00",
+        "hour_rel": 4,
+        "lat": 3.96806,
+        "lon": 105.88662,
+        "sog_kts": 15.6,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      }
+    ]
+  },
+  {
+    "mmsi": 367412890,
+    "imo": 9299100,
+    "vessel_name": "Deepwater Vanguard (Dark Fleet)",
+    "vessel_type": "Offshore Supply & Bilge Tanker",
+    "flag": "Vanuatu 🇻🇺 / Shadow Registry",
+    "dwt": 32000,
+    "is_shadow_fleet": true,
+    "theater": "Gulf of Mexico",
+    "nominal_speed_kts": 13.9,
+    "discharge_speed_kts": 3.2,
+    "blackout_duration_hours": 3.1,
+    "cpa_actual_meters": 62.0,
+    "pings": [
+      {
+        "timestamp": "2026-09-05T15:19:32.471222+00:00",
+        "hour_rel": -24,
+        "lat": 27.53982,
+        "lon": -91.25708,
+        "sog_kts": 13.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T19:19:32.471222+00:00",
+        "hour_rel": -20,
+        "lat": 27.93138,
+        "lon": -90.29963,
+        "sog_kts": 13.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T22:19:32.471222+00:00",
+        "hour_rel": -17,
+        "lat": 28.22505,
+        "lon": -89.58154,
+        "sog_kts": 13.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T00:19:32.471222+00:00",
+        "hour_rel": -15,
+        "lat": 28.42082,
+        "lon": -89.10282,
+        "sog_kts": 13.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T01:49:32.471222+00:00",
+        "hour_rel": -13.5,
+        "lat": 28.56766,
+        "lon": -88.74377,
+        "sog_kts": 3.2,
+        "cog_deg": 120.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T03:19:32.471222+00:00",
+        "hour_rel": -12,
+        "lat": 28.71449,
+        "lon": -88.38473,
+        "sog_kts": 3.2,
+        "cog_deg": 120.0,
+        "is_transponder_suppressed": true
+      },
+      {
+        "timestamp": "2026-09-06T04:49:32.471222+00:00",
+        "hour_rel": -10.5,
+        "lat": 28.86133,
+        "lon": -88.02569,
+        "sog_kts": 3.2,
+        "cog_deg": 120.0,
+        "is_transponder_suppressed": true
+      },
+      {
+        "timestamp": "2026-09-06T06:19:32.471222+00:00",
+        "hour_rel": -9,
+        "lat": 29.00816,
+        "lon": -87.66665,
+        "sog_kts": 13.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T08:19:32.471222+00:00",
+        "hour_rel": -7,
+        "lat": 29.20394,
+        "lon": -87.18792,
+        "sog_kts": 13.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T10:19:32.471222+00:00",
+        "hour_rel": -5,
+        "lat": 29.39972,
+        "lon": -86.7092,
+        "sog_kts": 13.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T12:19:32.471222+00:00",
+        "hour_rel": -3,
+        "lat": 29.5955,
+        "lon": -86.23047,
+        "sog_kts": 13.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T14:19:32.471222+00:00",
+        "hour_rel": -1,
+        "lat": 29.79128,
+        "lon": -85.75175,
+        "sog_kts": 13.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T15:19:32.471222+00:00",
+        "hour_rel": 0,
+        "lat": 29.88917,
+        "lon": -85.51239,
+        "sog_kts": 13.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T17:19:32.471222+00:00",
+        "hour_rel": 2,
+        "lat": 30.08495,
+        "lon": -85.03366,
+        "sog_kts": 13.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T19:19:32.471222+00:00",
+        "hour_rel": 4,
+        "lat": 30.28073,
+        "lon": -84.55494,
+        "sog_kts": 13.9,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      }
+    ]
+  },
+  {
+    "mmsi": 368001240,
+    "imo": 9481230,
+    "vessel_name": "Eagle Texas",
+    "vessel_type": "Aframax Crude Carrier",
+    "flag": "United States 🇺🇸",
+    "dwt": 115000,
+    "is_shadow_fleet": false,
+    "theater": "Gulf of Mexico",
+    "nominal_speed_kts": 14.5,
+    "discharge_speed_kts": 5.0,
+    "blackout_duration_hours": 0.0,
+    "cpa_actual_meters": 520.0,
+    "pings": [
+      {
+        "timestamp": "2026-09-05T15:19:32.471222+00:00",
+        "hour_rel": -24,
+        "lat": 27.48538,
+        "lon": -91.37908,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T19:19:32.471222+00:00",
+        "hour_rel": -20,
+        "lat": 27.89384,
+        "lon": -90.3803,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-05T22:19:32.471222+00:00",
+        "hour_rel": -17,
+        "lat": 28.20018,
+        "lon": -89.63122,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T00:19:32.471222+00:00",
+        "hour_rel": -15,
+        "lat": 28.40441,
+        "lon": -89.13183,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T01:49:32.471222+00:00",
+        "hour_rel": -13.5,
+        "lat": 28.55759,
+        "lon": -88.75729,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T03:19:32.471222+00:00",
+        "hour_rel": -12,
+        "lat": 28.71076,
+        "lon": -88.38275,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T04:49:32.471222+00:00",
+        "hour_rel": -10.5,
+        "lat": 28.86393,
+        "lon": -88.0082,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T06:19:32.471222+00:00",
+        "hour_rel": -9,
+        "lat": 29.01711,
+        "lon": -87.63366,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T08:19:32.471222+00:00",
+        "hour_rel": -7,
+        "lat": 29.22134,
+        "lon": -87.13427,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T10:19:32.471222+00:00",
+        "hour_rel": -5,
+        "lat": 29.42557,
+        "lon": -86.63489,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T12:19:32.471222+00:00",
+        "hour_rel": -3,
+        "lat": 29.6298,
+        "lon": -86.1355,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T14:19:32.471222+00:00",
+        "hour_rel": -1,
+        "lat": 29.83403,
+        "lon": -85.63611,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T15:19:32.471222+00:00",
+        "hour_rel": 0,
+        "lat": 29.93614,
+        "lon": -85.38641,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T17:19:32.471222+00:00",
+        "hour_rel": 2,
+        "lat": 30.14037,
+        "lon": -84.88703,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      },
+      {
+        "timestamp": "2026-09-06T19:19:32.471222+00:00",
+        "hour_rel": 4,
+        "lat": 30.3446,
+        "lon": -84.38764,
+        "sog_kts": 14.5,
+        "cog_deg": 65.0,
+        "is_transponder_suppressed": false
+      }
+    ]
+  }
+]

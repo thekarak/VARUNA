@@ -5,10 +5,13 @@ import datetime
 import sys
 from typing import List, Dict, Any
 
-# Ensure ml_pipeline is resolvable
-for _p in ("/", "/ml_pipeline", "/app"):
-    if _p not in sys.path:
-        sys.path.insert(0, _p)
+from pathlib import Path
+_curr = Path(__file__).resolve()
+# Dynamic path resolution for Render, Docker, and local execution
+for _candidate in (_curr.parents[3], _curr.parents[2], _curr.parents[3] / "ml_pipeline", Path("/"), Path("/app"), Path("/ml_pipeline")):
+    _p_str = str(_candidate)
+    if _p_str not in sys.path and _candidate.exists():
+        sys.path.insert(0, _p_str)
 
 from app.workers.celery_app import celery_app
 
@@ -557,7 +560,10 @@ def run_varuna_forensic_pipeline(
     self.update_state(state="PROGRESS", meta={"step": "4/4", "detail": "Querying AIS trajectory database & calculating CPA/blackout anomalies."})
     time_of_discharge = (dt_parsed - datetime.timedelta(hours=sim_hours)).isoformat()
     
-    from backend.app.services.ais_service import query_and_score_ais_vessels
+    try:
+        from app.services.ais_service import query_and_score_ais_vessels
+    except ImportError:
+        from backend.app.services.ais_service import query_and_score_ais_vessels
     vessels_scored = query_and_score_ais_vessels(
         origin_lat=origin_point[0],
         origin_lon=origin_point[1],
