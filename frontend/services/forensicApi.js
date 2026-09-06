@@ -1,6 +1,6 @@
 const ForensicApi = {
   API_BASE: (function() {
-    if (typeof window === "undefined") return "http://localhost:8000";
+    if (typeof window === "undefined") return "https://varuna-e1tx.onrender.com";
     try {
       const urlParams = new URLSearchParams(window.location.search);
       const paramApi = urlParams.get("api");
@@ -11,6 +11,9 @@ const ForensicApi = {
       const storedApi = window.localStorage.getItem("VARUNA_API_URL");
       if (storedApi) return storedApi.replace(/\/+$/, "");
       if (window.VARUNA_API_URL) return window.VARUNA_API_URL.replace(/\/+$/, "");
+      if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+        return "https://varuna-e1tx.onrender.com";
+      }
     } catch (e) {}
     return "http://localhost:8000";
   })(),

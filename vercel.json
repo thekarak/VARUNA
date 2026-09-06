@@ -3,6 +3,9 @@
   "cleanUrls": true,
   "outputDirectory": "frontend",
   "rewrites": [
+    { "source": "/api/:path*", "destination": "https://varuna-e1tx.onrender.com/api/:path*" },
+    { "source": "/docs", "destination": "https://varuna-e1tx.onrender.com/docs" },
+    { "source": "/openapi.json", "destination": "https://varuna-e1tx.onrender.com/openapi.json" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/", "destination": "/index.html" }
   ],
