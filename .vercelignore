@@ -1,8 +1,6 @@
-main.py
-requirements.txt
-Procfile
-render.yaml
 backend/
 ml_pipeline/
-Dockerfile
-.dockerignore
+scratch/
+render.yaml
+docker-compose.yml
+requirements.txt
