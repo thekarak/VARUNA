@@ -91,7 +91,238 @@ const ForensicApi = {
     });
   },
 
-  runDetectionPipeline: function(params = {}, onProgress) {
+
+  hashSeed: function(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  },
+
+  mulberry32: function(seed) {
+    let a = seed >>> 0;
+    return function() {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  },
+
+  regionFor: function(lat, lng) {
+    const R = [
+      { id: "baybengal", theater: "Bay of Bengal", lat: [8, 24], lng: [78, 96],
+        flags: [["India", "419", "IN"], ["Bangladesh", "405", "BD"], ["Singapore", "563", "SG"]] },
+      { id: "arabian", theater: "Arabian Sea", lat: [5, 26], lng: [64, 78],
+        flags: [["India", "419", "IN"], ["Pakistan", "463", "PK"], ["Panama", "352", "PA"]] },
+      { id: "hormuz", theater: "Strait of Hormuz", lat: [22, 32], lng: [46, 62],
+        flags: [["Saudi Arabia", "403", "SA"], ["UAE", "470", "AE"], ["Panama", "352", "PA"]] },
+      { id: "malacca", theater: "Strait of Malacca", lat: [-5, 12], lng: [95, 112],
+        flags: [["Singapore", "563", "SG"], ["Malaysia", "533", "MY"], ["Indonesia", "525", "ID"]] },
+      { id: "gulfmex", theater: "Gulf of Mexico", lat: [18, 32], lng: [-98, -80],
+        flags: [["USA", "366", "US"], ["Panama", "352", "PA"]] },
+      { id: "northsea", theater: "North Sea", lat: [48, 62], lng: [-6, 12],
+        flags: [["United Kingdom", "232", "GB"], ["Netherlands", "244", "NL"]] },
+      { id: "med", theater: "Mediterranean Sea", lat: [30, 46], lng: [-8, 36],
+        flags: [["Greece", "239", "GR"], ["Panama", "352", "PA"]] }
+    ];
+    for (const r of R) {
+      if (lat >= r.lat[0] && lat <= r.lat[1] && lng >= r.lng[0] && lng <= r.lng[1]) return r;
+    }
+    return { id: "openocean", theater: "Open Ocean",
+      flags: [["Panama", "352", "PA"], ["Liberia", "636", "LR"], ["Marshall Islands", "538", "MH"]] };
+  },
+
+  // Location-seeded suspect pool (vessel fix): manual coordinates produce a
+  // deterministic, region-plausible traffic set — same coords always give the
+  // same vessels, different coords give different vessels. Shapes mirror the
+  // preset pools (trail[{lat,lng,status,time}], warningTags, speedHistory).
+  generateVesselsForCoordinates: function(lat, lng) {
+    const rng = ForensicApi.mulberry32(
+      ForensicApi.hashSeed(lat.toFixed(3) + ":" + lng.toFixed(3)));
+    const region = ForensicApi.regionFor(lat, lng);
+    const nameA = ["OCEAN", "STAR", "PACIFIC", "NORDIC", "GULF", "CORAL", "MERIDIAN", "MONSOON", "CRESCENT", "TRADE"];
+    const nameB = ["TITAN", "VOYAGER", "PROSPERITY", "GLORY", "SENTINEL", "PIONEER", "TRADER", "MARINER", "CHAMPION", "SPIRIT"];
+    const types = [["Crude Oil Tanker", 160000], ["Product Tanker", 60000], ["Chemical Tanker", 45000],
+      ["Bulk Carrier", 80000], ["Container Ship", 95000], ["VLCC Crude Carrier", 300000]];
+    const usedNames = {};
+    const usedMmsi = {};
+    const vessels = [];
+    const laneDeg = rng() * 360;
+    const laneRad = laneDeg * Math.PI / 180;
+    const dirLat = Math.cos(laneRad);
+    const dirLng = Math.sin(laneRad);
+    const kmPerLat = 111.32;
+    const kmPerLng = 111.32 * Math.cos(lat * Math.PI / 180);
+
+    for (let i = 0; i < 4; i++) {
+      let nm = nameA[Math.floor(rng() * nameA.length)] + " " + nameB[Math.floor(rng() * nameB.length)];
+      while (usedNames[nm]) nm += " " + (2 + Math.floor(rng() * 8));
+      usedNames[nm] = true;
+      const flagPick = region.flags[Math.floor(rng() * region.flags.length)];
+      let mmsi = flagPick[1] + String(Math.floor(rng() * 900000) + 100000);
+      while (usedMmsi[mmsi]) mmsi = flagPick[1] + String(Math.floor(rng() * 900000) + 100000);
+      usedMmsi[mmsi] = true;
+      const typePick = types[Math.floor(rng() * types.length)];
+      const isPrime = (i === 0);
+      const cpaNM = isPrime
+        ? parseFloat((0.3 + rng() * 1.2).toFixed(2))
+        : parseFloat((1.8 + i * 2.2 + rng() * 1.5).toFixed(2));
+      const cruise = parseFloat((12.5 + rng() * 4).toFixed(1));
+      const disch = isPrime ? parseFloat((2.5 + rng() * 2).toFixed(1)) : parseFloat((cruise - rng() * 1.5).toFixed(1));
+      const blackoutH = isPrime ? parseFloat((2 + rng() * 12).toFixed(1)) : 0;
+      const driftCon = isPrime
+        ? parseFloat((88 + rng() * 11).toFixed(1))
+        : parseFloat(Math.max(5, 62 - i * 15 + rng() * 8).toFixed(1));
+      const courseDelta = isPrime ? parseFloat((12 + rng() * 25).toFixed(1)) : parseFloat((rng() * 8).toFixed(1));
+      // CPA point offset perpendicular to the lane, then a 7-ping trail through it.
+      const side = rng() > 0.5 ? 1 : -1;
+      const cpaKm = cpaNM * 1.852;
+      const cpaLat = lat + side * (cpaKm * -Math.sin(laneRad)) / kmPerLat;
+      const cpaLng = lng + side * (cpaKm * Math.cos(laneRad)) / kmPerLng;
+      const stepKm = cruise * 1.852 * 2; // ~2h between pings at cruise speed
+      const trail = [];
+      for (let k = 0; k < 7; k++) {
+        const backKm = (4 - k) * stepKm;
+        const tLat = parseFloat((cpaLat - backKm * dirLat / kmPerLat).toFixed(5));
+        const tLng = parseFloat((cpaLng - backKm * dirLng / kmPerLng).toFixed(5));
+        const status = (isPrime && k >= 2 && k <= 4)
+          ? (k === 2 ? "blackout_start" : (k === 4 ? "blackout_end" : "blackout_interpolated"))
+          : "active";
+        trail.push({ lat: tLat, lng: tLng, status: status, time: "T-" + ((6 - k) * 2) + "h" });
+      }
+      const speedHistory = [];
+      for (let k = 0; k < 12; k++) {
+        let s;
+        if (!isPrime) s = cruise + (rng() - 0.5) * 0.4;
+        else if (k < 3) s = cruise;
+        else if (k < 5) s = cruise - (cruise - disch) * ((k - 2) / 2);
+        else if (k < 8) s = disch + (rng() - 0.5) * 0.4;
+        else s = disch + (cruise - disch) * ((k - 7) / 4);
+        speedHistory.push(parseFloat(s.toFixed(1)));
+      }
+      const tags = isPrime
+        ? ["Speed Drop (" + cruise + "->" + disch + " kts)",
+           "AIS Void (" + blackoutH + "h)",
+           "Origin Intercept (" + cpaNM + " NM)",
+           "Discharge Window"]
+        : (cpaNM < 6
+            ? ["Proximity Correlation (" + cpaNM + " NM)", "AIS Continuous"]
+            : ["Nominal Transit (" + cpaNM + " NM)", "AIS Continuous"]);
+      vessels.push({
+        mmsi: mmsi,
+        imo: String(9000000 + Math.floor(rng() * 999999)),
+        name: nm,
+        type: typePick[0],
+        flag: flagPick[0],
+        flagCode: flagPick[2],
+        dwt: typePick[1],
+        owner: flagPick[0] + " Registry Fleet // " + region.theater,
+        theater: region.theater,
+        riskScore: 0,
+        proximityNM: cpaNM,
+        driftConcordance: driftCon,
+        speedDelta: parseFloat((disch - cruise).toFixed(1)),
+        courseDelta: courseDelta,
+        blackoutDurationHours: blackoutH,
+        warningTags: tags,
+        speedHistory: speedHistory,
+        trail: trail
+      });
+    }
+    return vessels;
+  },
+
+  // Maps live backend vessels_scored entries onto the UI vessel shape so a
+  // reachable backend upgrades the panel from generated to measured data.
+  mapBackendVessels: function(list, origin) {
+    const dwtByType = [["VLCC", 300000], ["SUEZMAX", 160000], ["AFRAMAX", 115000],
+      ["CRUDE", 150000], ["PRODUCT", 60000], ["CHEMICAL", 45000], ["BULK", 80000],
+      ["CONTAINER", 95000], ["BUNKER", 8000], ["BARGE", 5000]];
+    const dwtFor = (t) => {
+      const u = String(t || "").toUpperCase();
+      for (const [k, v] of dwtByType) { if (u.includes(k)) return v; }
+      return 50000;
+    };
+    const tierFor = (s) => (s > 70 ? "HIGH_PRIORITY_INVESTIGATIVE_LEAD"
+      : (s > 35 ? "INVESTIGATION_CANDIDATE" : "NO_SIGNIFICANT_CORRELATION"));
+    return (list || []).map((bv) => {
+      const tags = (bv.anomalies && bv.anomalies.length) ? bv.anomalies : ["Nominal Transit"];
+      const tagStr = tags.join(" ");
+      const bm = /AIS Blackout \((\d+)h\s*(\d+)?m?/.exec(tagStr);
+      const blackoutH = bm ? parseFloat(bm[1]) + (bm[2] ? parseFloat(bm[2]) / 60 : 0) : 0;
+      const proxM = (bv.proximity_m != null) ? bv.proximity_m
+        : ((bv.proximity_meters != null) ? bv.proximity_meters : 9000);
+      const cruise = parseFloat(bv.speed_knots != null ? bv.speed_knots
+        : (bv.cruising_speed_kts != null ? bv.cruising_speed_kts : 14));
+      const disch = parseFloat(bv.discharge_window_speed != null ? bv.discharge_window_speed
+        : (bv.speed_at_cpa_kts != null ? bv.speed_at_cpa_kts : cruise));
+      const rawPath = (bv.path && bv.path.length) ? bv.path
+        : (origin ? [[origin.latitude, origin.longitude]] : []);
+      const trail = rawPath.map((p, i) => ({
+        lat: p[0], lng: p[1],
+        status: (blackoutH > 0 && i >= 1 && i <= 3) ? "blackout_interpolated" : "active",
+        time: "T-" + ((rawPath.length - 1 - i) * 2) + "h"
+      }));
+      const hist = [];
+      for (let k = 0; k < 12; k++) {
+        let s;
+        if (k < 3) s = cruise;
+        else if (k < 5) s = cruise - (cruise - disch) * ((k - 2) / 2);
+        else if (k < 8) s = disch;
+        else s = disch + (cruise - disch) * ((k - 7) / 4);
+        hist.push(parseFloat(s.toFixed(1)));
+      }
+      const score = (bv.score != null) ? bv.score : 0;
+      const vtype = bv.vessel_type || "Merchant Vessel";
+      return {
+        mmsi: String(bv.mmsi),
+        imo: String(bv.imo || "—"),
+        name: bv.vessel_name || ("VESSEL-" + bv.mmsi),
+        type: vtype,
+        flag: bv.flag_registry || bv.flag || "Unknown",
+        flagCode: "",
+        dwt: dwtFor(vtype),
+        owner: "AIS-correlated traffic",
+        riskScore: score,
+        proximityNM: parseFloat((proxM / 1852).toFixed(2)),
+        driftConcordance: (bv.spatial_score != null) ? bv.spatial_score : 50,
+        speedDelta: parseFloat((disch - cruise).toFixed(1)),
+        courseDelta: 0,
+        blackoutDurationHours: parseFloat(blackoutH.toFixed(2)),
+        warningTags: tags,
+        speedHistory: hist,
+        trail: trail,
+        riskTier: tierFor(score)
+      };
+    });
+  },
+
+  pollBackendTask: function(taskId, onDone) {
+    let tries = 0;
+    const timer = setInterval(async () => {
+      tries += 1;
+      try {
+        const res = await fetch(ForensicApi.API_BASE + "/api/v1/task/" + taskId);
+        if (res.ok) {
+          const data = await res.json();
+          const done = (data.status === "SUCCESS")
+            || (data.result && data.result.status === "COMPLETED");
+          if (done && data.result && data.result.vessels_scored) {
+            clearInterval(timer);
+            onDone(ForensicApi.mapBackendVessels(data.result.vessels_scored, data.result.calculated_origin));
+            return;
+          }
+          if (data.status === "FAILURE") { clearInterval(timer); return; }
+        }
+      } catch (e) { /* keep local results on any error */ }
+      if (tries >= 12) clearInterval(timer);
+    }, 6000);
+  },
+
+  runDetectionPipeline: function(params = {}, onProgress, onBackendVessels) {
     const scenarioId = params.scenarioId || "hormuz";
     const scenarios = window.mockScenarios || [];
     const presetScenario = scenarios.find((s) => s.id === scenarioId) || scenarios[0];
@@ -207,10 +438,13 @@ const ForensicApi = {
       forecastTrajectory.push([parseFloat(fLat.toFixed(5)), parseFloat(fLng.toFixed(5))]);
     }
 
-    // --- STAGE 4: AIS weighted multi-factor kinematic scoring ---
-    const rawVessels = (window.mockVesselsByScenario || {})[scenarioId]
-      || (window.mockVesselsByScenario || {})["hormuz"]
-      || [];
+    // --- STAGE 4: vessel pool — generated per-coordinate on manual override
+    // (vessel fix), preset pool otherwise so scenario browsing is unchanged.
+    const rawVessels = currentScenario.manualOverride
+      ? ForensicApi.generateVesselsForCoordinates(currentScenario.lat, currentScenario.lng)
+      : ((window.mockVesselsByScenario || {})[scenarioId]
+        || (window.mockVesselsByScenario || {})["hormuz"]
+        || []);
     const scoredVessels = rawVessels.map(v => {
       const cpaScore = Math.max(0, 1 - v.proximityNM / 15) * 30;
       const blackoutScore = Math.min((v.blackoutDurationHours || 0) / Math.max(spillAgeHours, 1), 1) * 35;
@@ -279,6 +513,12 @@ const ForensicApi = {
         }
         stageStates[i].status = "DONE";
         if (onProgress) onProgress([...stageStates]);
+      }
+
+      // If the live backend accepted the job, upgrade the panel with measured
+      // vessels when its pipeline finishes (progressive enhancement).
+      if (backendTaskId && typeof onBackendVessels === "function") {
+        try { ForensicApi.pollBackendTask(backendTaskId, onBackendVessels); } catch (e) {}
       }
 
       resolve({

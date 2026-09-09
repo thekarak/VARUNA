@@ -274,7 +274,7 @@ V.A.R.U.N.A. is deployed on a decoupled, production-grade cloud architecture lev
 |                FRONTEND (Vercel Edge Network)               |
 |  * 3D Mission Landing Canvas (Three.js / WebGL)             |
 |  * Tactical Forensic Dashboard (Leaflet + CARTO Basemaps)   |
-|  * Live URL: https://varuna-sooty.vercel.app                |
+|  * Live URL: https://varuna-omega.vercel.app                |
 +------------------------------+------------------------------+
                                |
                         HTTPS REST / CORS

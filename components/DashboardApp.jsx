@@ -344,17 +344,35 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
       map.removeLayer(tileLayerRef.current);
     }
 
-    const cartoKey = window.CARTO_API_KEY || "cb1_2vlt_1_8a2a2b183412e738d2fe8ff8";
     const basemapSubpath = mapTheme === "dark" ? "dark_all" : "light_all";
-    const tileUrl = cartoKey
-      ? `https://{s}.basemaps.cartocdn.com/${basemapSubpath}/{z}/{x}/{y}{r}.png?key=${cartoKey}`
-      : `https://{s}.basemaps.cartocdn.com/${basemapSubpath}/{z}/{x}/{y}{r}.png`;
-
-    const tileLayer = L.tileLayer(tileUrl, {
+    // Keyless CARTO endpoint: the previously hardcoded ?key= token 403s every
+    // tile when invalid (the black-map symptom). If CARTO keeps failing, fall
+    // back to OSM standard tiles so the map always paints.
+    const tileLayer = L.tileLayer(`https://{s}.basemaps.cartocdn.com/${basemapSubpath}/{z}/{x}/{y}{r}.png`, {
       subdomains: "abcd",
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
     }).addTo(map);
+
+    let tileErrors = 0;
+    let fellBack = false;
+    tileLayer.on("tileerror", () => {
+      tileErrors += 1;
+      if (!fellBack && tileErrors >= 6) {
+        fellBack = true;
+        try {
+          const hostMap = mapInstanceRef.current;
+          if (hostMap) {
+            hostMap.removeLayer(tileLayer);
+            const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+              maxZoom: 19,
+              attribution: "&copy; OpenStreetMap contributors"
+            }).addTo(hostMap);
+            tileLayerRef.current = osm;
+          }
+        } catch (e) { /* keep CARTO layer on any error */ }
+      }
+    });
 
     tileLayerRef.current = tileLayer;
   }, [mapTheme]);
@@ -1262,6 +1280,9 @@ function DashboardApp() {
       },
       (updatedStages) => {
         setPipelineStages(updatedStages);
+      },
+      (backendVessels) => {
+        setVessels(backendVessels);
       }
     ).then((result) => {
       setIsRunningPipeline(false);
