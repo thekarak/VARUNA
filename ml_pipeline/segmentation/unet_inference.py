@@ -1,8 +1,14 @@
 """
-U-Net & Computer Vision Semantic Segmentation Pipeline for SAR Oil Spill Detection.
-Processes real satellite SAR / multispectral imagery to detect oil slicks,
-extract physical boundaries, compute real spatial metrics, and estimate spill age.
-Compliant with SIH PS 26143 (NTRO) specifications.
+Segmentation stage ("U-Net stage") for SAR Oil Spill Detection.
+
+HONEST STATUS (SIH audit): the production design calls for trained U-Net
+weights (PyTorch). Those weights are NOT bundled in this prototype, so this
+stage runs a REAL classical radar-vision chain on the ACTUAL input pixels —
+bilateral speckle filtering, adaptive dark-spot thresholding, morphology and
+contour extraction. Every geometric output (area, perimeter, polygon,
+centroid) is measured from the input image, never hard-coded. Production
+swaps this function body for trained U-Net inference; the contract is
+unchanged. Compliant with SIH PS 26143 (NTRO) specifications.
 """
 
 import os
@@ -97,7 +103,8 @@ def execute_unet_segmentation(
     gsd_m: float = 10.0  # Sentinel-1 IW mode standard 10m Ground Sampling Distance
 ) -> Dict[str, Any]:
     """
-    Executes computer vision segmentation on real satellite radar imagery:
+    Executes classical vision segmentation on the real input radar pixels
+    (prototype stand-in for trained U-Net weights):
     1. Loads raw SAR / optical imagery.
     2. Bilateral filtering for SAR speckle noise attenuation.
     3. Adaptive Otsu dark-spot backscatter thresholding (oil dampening).

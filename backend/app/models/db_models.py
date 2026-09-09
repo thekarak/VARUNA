@@ -30,6 +30,9 @@ class VesselTelemetry(Base):
     speed_knots = Column(Float, nullable=False)
     heading_degrees = Column(Float, nullable=False)
     geom = Column(Geometry(geometry_type='POINT', srid=4326), nullable=False)
+    # Ground-truth transponder state from the AIS feed (True = feed reports
+    # the transponder suppressed at this ping). Complements gap analysis.
+    is_transponder_suppressed = Column(Boolean, nullable=False, default=False)
 
 
 class SuspectCorrelation(Base):

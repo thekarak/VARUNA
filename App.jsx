@@ -664,7 +664,7 @@ function ForensicInspectorTerminal() {
   const tabs = [
     { id: 0, label: "01 // SAR POLARIMETRY", name: "SAR Spectrogram" },
     { id: 1, label: "02 // AIS KINEMATICS", name: "Dead-Reckoning Radar" },
-    { id: 2, label: "03 // BAYESIAN MATRIX", name: "Attribution Gauge" },
+    { id: 2, label: "03 // MULTI-FACTOR MATRIX", name: "Attribution Gauge" },
     { id: 3, label: "04 // EVIDENCE SEAL", name: "Cryptographic Docket" }
   ];
 
@@ -849,7 +849,7 @@ function ForensicInspectorTerminal() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             <div className="lg:col-span-5 bg-[#050810] border border-white/[0.06] rounded-xl p-6 flex flex-col items-center justify-center text-center">
               <span className="font-mono text-xs uppercase tracking-widest text-slate-400 mb-4">
-                BAYESIAN ATTRIBUTION PROBABILITY
+                MULTI-FACTOR ATTRIBUTION SCORE
               </span>
               <div className="relative w-40 h-40 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
@@ -1049,7 +1049,7 @@ function App() {
     { num: "02", name: "DETECT", desc: "Identify suspected oil slicks.", telemetry: "CNN FEATURE MASK · VV/VH POLARIZATION · 99.4% CONF" },
     { num: "03", name: "TRACE", desc: "Reconstruct drift and determine the origin window.", telemetry: "LAGRANGIAN HINDCAST · HYCOM 1.84KTS · 225° SW" },
     { num: "04", name: "CORRELATE", desc: "Match vessel trajectories with the event.", telemetry: "AIS DEAD-RECKONING · MMSI 538009214 · OFFSET 0.8NM" },
-    { num: "05", name: "ATTRIBUTE", desc: "Score anomalies and identify probable suspects.", telemetry: "BAYESIAN PROBABILITY: 94.8% · SPEED DELTA -4.2KTS" },
+    { num: "05", name: "ATTRIBUTE", desc: "Score anomalies and identify probable suspects.", telemetry: "PRIORITY SCORE: 94.8% · SPEED DELTA -4.2KTS" },
     { num: "06", name: "DOCUMENT", desc: "Generate a forensic evidence record.", telemetry: "DOSSIER SEALED · SHA-256 HASH VERIFIED" }
   ];
 

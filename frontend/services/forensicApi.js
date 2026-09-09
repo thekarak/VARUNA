@@ -94,7 +94,34 @@ const ForensicApi = {
   runDetectionPipeline: function(params = {}, onProgress) {
     const scenarioId = params.scenarioId || "hormuz";
     const scenarios = window.mockScenarios || [];
-    const currentScenario = scenarios.find((s) => s.id === scenarioId) || scenarios[0];
+    const presetScenario = scenarios.find((s) => s.id === scenarioId) || scenarios[0];
+
+    // Manual coordinate override (map-position fix): operator-typed lat/lng
+    // take precedence over the preset scenario center. Values are validated
+    // (finite, lat +/-90, lng +/-180); invalid input falls back to the preset
+    // center. The preset slick polygon is translated by the same delta so the
+    // slick renders AT the entered coordinates instead of the preset site.
+    const parsedLat = parseFloat(params.lat);
+    const parsedLng = parseFloat(params.lng);
+    const hasOverride =
+      Number.isFinite(parsedLat) && Number.isFinite(parsedLng) &&
+      parsedLat >= -90 && parsedLat <= 90 && parsedLng >= -180 && parsedLng <= 180;
+    const effLat = hasOverride ? parsedLat : presetScenario.lat;
+    const effLng = hasOverride ? parsedLng : presetScenario.lng;
+    const shiftLat = effLat - presetScenario.lat;
+    const shiftLng = effLng - presetScenario.lng;
+    const shiftedPolygon = (presetScenario.slickPolygon || []).map((pt) => [
+      parseFloat((pt[0] + shiftLat).toFixed(5)),
+      parseFloat((pt[1] + shiftLng).toFixed(5))
+    ]);
+    const currentScenario = {
+      ...presetScenario,
+      lat: effLat,
+      lng: effLng,
+      slickPolygon: shiftedPolygon,
+      imageUrl: params.imageUrl || presetScenario.imageUrl,
+      manualOverride: hasOverride
+    };
 
     const stages = [
       { id: "stage1", num: "01", name: "Image Enhancement (ESRGAN)", delay: 700 },
@@ -180,7 +207,7 @@ const ForensicApi = {
       forecastTrajectory.push([parseFloat(fLat.toFixed(5)), parseFloat(fLng.toFixed(5))]);
     }
 
-    // --- STAGE 4: AIS Bayesian Kinematic Scoring ---
+    // --- STAGE 4: AIS weighted multi-factor kinematic scoring ---
     const rawVessels = (window.mockVesselsByScenario || {})[scenarioId]
       || (window.mockVesselsByScenario || {})["hormuz"]
       || [];
@@ -190,7 +217,7 @@ const ForensicApi = {
       const speedScore = v.speedDelta < -2 ? 20 : v.speedDelta < -0.5 ? 10 : 0;
       const driftScore = v.driftConcordance > 85 ? 15 : v.driftConcordance > 70 ? 8 : 0;
       const dynamicScore = parseFloat(Math.min(99.9, cpaScore + blackoutScore + speedScore + driftScore + (Math.random() * 1.8)).toFixed(1));
-      const tier = dynamicScore > 70 ? 'CRITICAL_LEAD' : dynamicScore > 35 ? 'INVESTIGATION_CANDIDATE' : 'CLEARED';
+      const tier = dynamicScore > 70 ? 'HIGH_PRIORITY_INVESTIGATIVE_LEAD' : dynamicScore > 35 ? 'INVESTIGATION_CANDIDATE' : 'NO_SIGNIFICANT_CORRELATION';
       return { ...v, riskScore: dynamicScore, riskTier: tier };
     });
     scoredVessels.sort((a, b) => b.riskScore - a.riskScore);

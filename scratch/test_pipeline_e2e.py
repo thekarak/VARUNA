@@ -2,7 +2,7 @@
 End-to-end verification of the updated VARUNA scientific pipeline:
 1. Real CV segmentation & age estimation on calibrated SAR image.
 2. Dual-direction Lagrangian advection (origin hindcast & future forecast) using real metocean data.
-3. Authentic AIS database query, CPA calculation, blackout gap detection & Bayesian scoring.
+3. AIS trajectory query, CPA calculation, blackout gap detection & weighted multi-factor scoring.
 """
 
 import sys
@@ -48,7 +48,7 @@ def run_e2e_test():
     print(f"  * Surface Current: {env['current_speed_ms']} m/s @ {env['current_bearing_deg']}°")
     print(f"  * Forward Forecast Steps: {len(env['forecast_trajectory'])} steps (Projecting future drift)")
 
-    # 3. AIS Trajectory Query & Bayesian Likelihood Scoring
+    # 3. AIS Trajectory Query & weighted multi-factor priority scoring
     discharge_dt = det_time - datetime.timedelta(hours=sim_hours)
     print(f"\n[STEP 3] Querying authentic AIS database at origin [{origin_point[0]}, {origin_point[1]}]...")
     vessels = query_and_score_ais_vessels(origin_point[0], origin_point[1], discharge_dt)

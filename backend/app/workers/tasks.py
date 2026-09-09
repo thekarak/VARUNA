@@ -315,8 +315,13 @@ def compute_forensic_probability(
     course_deviation_deg: float
 ) -> Dict[str, Any]:
     """
-    Computes an authentic Bayesian Multi-Factor Maritime Forensic Likelihood Index.
-    1. Spatial Proximity Likelihood: Gaussian kernel (sigma = 650m)
+    Computes a weighted multi-factor maritime forensic priority score.
+
+    HONEST STATUS (SIH audit): heuristic index (Spatial 40% + Transponder
+    30% + Kinematic 20% + Course 10%). NOT a calibrated Bayesian posterior —
+    no prior, likelihood, or marginal normalization — present it as a
+    "weighted multi-factor forensic priority score".
+    1. Spatial Proximity factor: Gaussian kernel (sigma = 650m)
     2. Kinematic Anomaly: Discharge speed drop ratio
     3. Transponder Integrity: AIS suppression score
     4. Navigational Course Anomaly: Unprompted turn angle
@@ -356,19 +361,20 @@ def compute_forensic_probability(
     )
     final_score = round(max(0.1, min(97.8, composite)), 1)
 
-    # Assign credible risk tier
+    # Investigative priority tiers (SIH audit: the model reports correlation
+    # strength only — it never clears/convicts a vessel, so no "exonerated").
     if final_score >= 75.0:
-        risk_tier = "CRITICAL_LEAD"
-        tier_label = "CRITICAL LEAD (DARK FLEET)"
+        risk_tier = "HIGH_PRIORITY_INVESTIGATIVE_LEAD"
+        tier_label = "HIGH-PRIORITY INVESTIGATIVE LEAD"
     elif final_score >= 35.0:
         risk_tier = "MODERATE_SUSPICION"
         tier_label = "INVESTIGATION CANDIDATE"
     elif final_score >= 10.0:
-        risk_tier = "LOW_RISK"
-        tier_label = "PERIPHERAL TRAFFIC"
+        risk_tier = "LOWER_CORRELATION"
+        tier_label = "LOWER CORRELATION / PERIPHERAL TRAFFIC"
     else:
-        risk_tier = "EXONERATED"
-        tier_label = "EXONERATED (OFF-SECTOR)"
+        risk_tier = "NO_SIGNIFICANT_CORRELATION"
+        tier_label = "NO SIGNIFICANT CORRELATION"
 
     return {
         "final_score": final_score,
@@ -557,7 +563,9 @@ def run_varuna_forensic_pipeline(
 
     # 2. U-Net Segmentation & Slick Boundary Extraction
     _progress(self, "2/4", "Running U-Net segmentation, contour extraction & age estimation.")
-    segmentation_results = execute_unet_segmentation(upscaled_image_path, latitude, longitude)
+    # Stage 1 upscales 4x, so each output pixel covers (10m/4)^2 — pass the
+    # effective ground sampling distance to keep area/volume physical.
+    segmentation_results = execute_unet_segmentation(upscaled_image_path, latitude, longitude, gsd_m=2.5)
 
     # 3. Lagrangian Ocean/Atmospheric Hindcasting & Forward Forecasting
     _progress(self, "3/4", "Executing physical Lagrangian hindcasting & forecasting.")
@@ -570,29 +578,52 @@ def run_varuna_forensic_pipeline(
     sim_hours = int(min(24, max(4, round(segmentation_results.get("spill_age_hours", 12.0)))))
     origin_point, trajectory, env_data = run_drift_hindcast(latitude, longitude, dt_parsed, simulation_hours=sim_hours)
 
-    # 4. Spatio-Temporal Correlation & Regional Suspect Identification from Real AIS Database
+    # 4. Spatio-Temporal Correlation & Suspect Identification.
+    # Attribution chain (first non-empty source wins; source recorded for
+    # judge transparency in `attribution_source`):
+    #   1. LIVE PostGIS ST_DWithin spatial join on vessel_telemetry
+    #   2. Bundled AIS trajectory file (same scoring engine, no DB needed)
+    #   3. Deterministic synthetic sector profiles (clearly labelled)
     _progress(self, "4/4", "Querying AIS trajectory database & calculating CPA/blackout anomalies.")
     time_of_discharge = (dt_parsed - datetime.timedelta(hours=sim_hours)).isoformat()
-    
+    discharge_dt = dt_parsed - datetime.timedelta(hours=sim_hours)
+
     try:
-        from app.services.ais_service import query_and_score_ais_vessels
+        from app.services import ais_service as _ais
     except ImportError:
-        from backend.app.services.ais_service import query_and_score_ais_vessels
+        from backend.app.services import ais_service as _ais
+
+    vessels_scored: List[Dict[str, Any]] = []
+    attribution_source = "synthetic-sector-model"
     try:
-        vessels_scored = query_and_score_ais_vessels(
+        vessels_scored = _ais.query_postgis_and_score(
             origin_lat=origin_point[0],
             origin_lon=origin_point[1],
-            discharge_time=dt_parsed - datetime.timedelta(hours=sim_hours)
+            discharge_time=discharge_dt,
         )
+        if vessels_scored:
+            attribution_source = "postgis-spatial-join"
     except Exception:
         vessels_scored = []
 
     if not vessels_scored:
-        # Fallback to local sector generator if no AIS records matched
+        try:
+            vessels_scored = _ais.query_and_score_ais_vessels(
+                origin_lat=origin_point[0],
+                origin_lon=origin_point[1],
+                discharge_time=discharge_dt,
+            )
+            if vessels_scored:
+                attribution_source = "file-ais-trajectories"
+        except Exception:
+            vessels_scored = []
+
+    if not vessels_scored:
+        # Last resort: deterministic synthetic sector profiles
         vessels_scored = build_suspect_vessel_profiles(
             origin_lat=origin_point[0],
             origin_lon=origin_point[1],
-            orig_time=dt_parsed - datetime.timedelta(hours=sim_hours),
+            orig_time=discharge_dt,
             env_data=env_data
         )
 
@@ -619,4 +650,13 @@ def run_varuna_forensic_pipeline(
         "drift_trajectory": trajectory,
         "forecast_trajectory": env_data.get("forecast_trajectory", []),
         "vessels_scored": vessels_scored,
+        "attribution_source": attribution_source,
+        "attribution_note": {
+            "postgis-spatial-join": "Suspects from live PostGIS ST_DWithin join.",
+            "file-ais-trajectories": "Suspects scored from bundled AIS file (no DB).",
+            "synthetic-sector-model": (
+                "DEMO fallback: deterministic synthetic profiles — "
+                "seed PostGIS (seed_postgis_ais) for live attribution."
+            ),
+        }[attribution_source],
     }

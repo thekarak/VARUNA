@@ -676,7 +676,7 @@ function CaseFileModal({ isOpen, onClose, scenario, vessels, metrics }) {
                     {topVessel.name} (MMSI: {topVessel.mmsi} · IMO: {topVessel.imo})
                   </span>
                   <span className="px-2.5 py-1 rounded bg-rose-900/60 border border-rose-500/40 text-rose-300 font-bold text-xs">
-                    BAYESIAN LIABILITY: {topVessel.riskScore}%
+                    PRIORITY SCORE: {topVessel.riskScore}%
                   </span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-slate-300 print:text-black pt-2 border-t border-rose-500/20">
@@ -1231,10 +1231,35 @@ function DashboardApp() {
 
   const handleRunPipeline = () => {
     if (isRunningPipeline) return;
+    const parsedLat = parseFloat(latInput);
+    const parsedLng = parseFloat(lngInput);
+    const validCoords =
+      Number.isFinite(parsedLat) && Number.isFinite(parsedLng) &&
+      parsedLat >= -90 && parsedLat <= 90 && parsedLng >= -180 && parsedLng <= 180;
+    // Move the map to the typed location immediately for operator feedback;
+    // the pipeline result refreshes metrics/vessels on completion.
+    if (validCoords && activeScenario) {
+      const moveLat = parsedLat - activeScenario.lat;
+      const moveLng = parsedLng - activeScenario.lng;
+      setActiveScenario({
+        ...activeScenario,
+        lat: parsedLat,
+        lng: parsedLng,
+        slickPolygon: (activeScenario.slickPolygon || []).map((pt) => [
+          parseFloat((pt[0] + moveLat).toFixed(5)),
+          parseFloat((pt[1] + moveLng).toFixed(5))
+        ])
+      });
+    }
     setIsRunningPipeline(true);
 
     ForensicApi.runDetectionPipeline(
-      { scenarioId: activeScenarioId },
+      {
+        scenarioId: activeScenarioId,
+        lat: validCoords ? parsedLat : undefined,
+        lng: validCoords ? parsedLng : undefined,
+        imageUrl: imageUrlInput || undefined
+      },
       (updatedStages) => {
         setPipelineStages(updatedStages);
       }
@@ -1520,7 +1545,7 @@ function DashboardApp() {
             <span className="text-xl sm:text-2xl font-black text-rose-400 mt-1 block">
               <CountUpNumber value={metrics.attributionConfidence} decimals={1} suffix="%" />
             </span>
-            <span className="text-[8.5px] text-rose-400 mt-1 block">BAYESIAN EVIDENCE</span>
+            <span className="text-[8.5px] text-rose-400 mt-1 block">MULTI-FACTOR EVIDENCE</span>
           </div>
 
           <div className="p-4 rounded-2xl bg-[#070c14]/92 border border-white/10 shadow-xl flex flex-col justify-between min-h-[115px]">
@@ -1601,7 +1626,7 @@ function DashboardApp() {
               <span className="text-rose-400 font-semibold tracking-wider uppercase">
                 SUSPECT VESSELS RANKED ({vessels.length})
               </span>
-              <span className="text-slate-500 font-mono text-[10px]">SORTED BY BAYESIAN RISK</span>
+              <span className="text-slate-500 font-mono text-[10px]">SORTED BY PRIORITY SCORE</span>
             </div>
 
             <div className="space-y-2.5 max-h-[580px] lg:max-h-[650px] overflow-y-auto pr-1 font-mono">
@@ -1685,7 +1710,7 @@ function DashboardApp() {
         <section className="bg-[#070c14]/92 backdrop-blur-xl border border-white/10 rounded-2xl p-5 sm:p-7 shadow-2xl">
           <div className="border-b border-white/10 pb-4 mb-5">
             <span className="font-mono text-xs font-bold text-cyan-400 tracking-[0.2em] uppercase block">
-              3D CORRELATION MATRIX & BAYESIAN ATTRIBUTION BREAKDOWN
+              3D CORRELATION MATRIX & MULTI-FACTOR ATTRIBUTION BREAKDOWN
             </span>
             <p className="font-sans text-xs text-slate-400 mt-0.5 font-light">
               Radial orbital distance indicates inverse liability confidence; right panel decomposes multi-variable physical evidence.

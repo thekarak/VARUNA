@@ -23,7 +23,7 @@ A particularly elusive scenario occurs when a commercial vessel intentionally di
 * **IMO / Bonn Agreement BAOAC Volume Modeling**: Physically accurate pure oil volume estimation ($V = A \times t$), classified across Bonn Codes 3, 4, and 5 with US barrel (bbl) and Metric Tonne (MT) outputs.
 * **Lagrangian Ocean Drift Hindcasting**: Backwards-in-time hydrodynamic advection powered by NOAA GFS wind forcing and Copernicus Marine (CMEMS) ocean surface currents.
 * **PostGIS Spatio-Temporal AIS Correlation**: High-performance spatial querying (`ST_DWithin`, `ST_Intersects`) over historical maritime trajectories.
-* **Bayesian Multi-Factor Likelihood Scoring**: Gaussian CPA distance decay, AIS blackout duration penalties, kinematic speed drop anomalies, and abrupt course alteration metrics.
+* **Weighted Multi-Factor Priority Scoring**: Gaussian CPA distance decay, AIS blackout duration penalties, kinematic speed drop anomalies, and abrupt course alteration metrics.
 * **Interactive Tactical GIS Canvas**: Powered by **CARTO Basemaps** and Leaflet with animated radar pings, multi-node fluid lobe polygons, and CPA-annotated vessel paths.
 * **3D Mission Landing Page**: 60 FPS Three.js WebGL globe featuring procedural ocean particle advection and atmospheric glow.
 * **Automated Forensic Case File PDF Generation**: Court-admissible evidence documentation with SHA-256 digital integrity verification.
@@ -76,7 +76,7 @@ A particularly elusive scenario occurs when a commercial vessel intentionally di
                                                  |
                                                  v
                                +-----------------+----------------+
-                               | Bayesian Multi-Factor Likelihood |
+                               | Weighted Multi-Factor Priority Score |
                                | AIS Blackout, CPA, Speed Drop    |
                                +-----------------+----------------+
                                                  |
@@ -118,8 +118,8 @@ Rather than arbitrary synthetic metrics, VARUNA implements the **Bonn Agreement 
   $$\text{Boundary Complexity} = \frac{P}{2\sqrt{\pi A}}$$
   Evaluates hydrodynamic slick elongation relative to the theoretical minimal circular perimeter ($P_{\min}$), indicating whether a slick is freshly released or dispersed by wave action.
 
-### 3. Bayesian Multi-Factor Forensic Likelihood Engine
-To provide credible, court-admissible suspect rankings, VARUNA uses a multi-factor probability model:
+### 3. Weighted Multi-Factor Forensic Priority Engine
+To provide credible investigative suspect rankings, VARUNA uses a weighted multi-factor heuristic score (a priority index, not a calibrated Bayesian posterior and not court-admissible evidence on its own):
 $$\text{Score} = 0.40 \cdot S_{\text{spatial}} + 0.30 \cdot S_{\text{transponder}} + 0.20 \cdot S_{\text{kinematic}} + 0.10 \cdot S_{\text{course}}$$
 
 * **Spatial Proximity Likelihood ($S_{\text{spatial}}$)**:
@@ -128,9 +128,9 @@ $$\text{Score} = 0.40 \cdot S_{\text{spatial}} + 0.30 \cdot S_{\text{transponder
 * **AIS Blackout Anomaly ($S_{\text{transponder}}$)**: Severe penalties ($85\% - 98\%$) for intentional transponder suppression during the estimated discharge window.
 * **Kinematic Speed Drop Ratio ($S_{\text{kinematic}}$)**: Detects deceleration from cruising speed ($14-18\,\text{kts}$) to illegal operational discharge speeds ($2-5\,\text{kts}$).
 * **Risk Categorization**:
-  * **CRITICAL LEAD (DARK FLEET)**: Score $\ge 70\%$, highlighted in crimson with blackout duration flags.
+  * **HIGH-PRIORITY INVESTIGATIVE LEAD**: Score $\ge 70\%$, highlighted in crimson with blackout duration flags.
   * **INVESTIGATION CANDIDATE**: Score $30\% - 70\%$, flagged for proximity correlation.
-  * **CLEARED / PERIPHERAL TRAFFIC**: Score $< 30\%$, standard commercial transit confirmed.
+  * **NO SIGNIFICANT CORRELATION / NOMINAL TRANSIT**: Score $< 30\%$, low correlation with available evidence (never an exoneration).
 
 ### 4. Lagrangian Ocean Drift Hindcast & Environmental Forcing
 * **Advection Model**: Reverse-time integration using combined wind and current vectors:
@@ -246,10 +246,22 @@ npm install
 npm run dev
 ```
 The dashboard is now live at:
-**http://localhost:3000** (or `http://localhost:3000/dashboard`)
+**http://localhost:3000/dashboard.html** (or `/dashboard`)
 
 3D Mission Landing Page:
-**http://localhost:3000/landing.html**
+**http://localhost:3000/index.html** (or `/`)
+
+### 4. Run Scientific Verification Tests
+```bash
+# Run the authentic vertical slice (ESRGAN -> U-Net -> Lagrangian ensemble -> AIS attribution)
+python scratch/test_vertical_slice.py
+
+# Run the end-to-end multi-scenario pipeline verification
+python scratch/test_pipeline_e2e.py
+
+# (Optional) Seed live PostGIS database with vessel trajectories
+python -m app.services.seed_postgis_ais --clear
+```
 
 ---
 
@@ -272,7 +284,7 @@ V.A.R.U.N.A. is deployed on a decoupled, production-grade cloud architecture lev
 |                BACKEND (Render Web Service)                 |
 |  * Python 3.11 + FastAPI + Uvicorn Gateway                  |
 |  * U-Net Segmentation & Fay Weathering Models               |
-|  * Lagrangian Drift Engine & Bayesian AIS Attribution       |
+|  * Lagrangian Drift Engine & Multi-Factor AIS Attribution       |
 |  * Live URL: https://varuna-e1tx.onrender.com               |
 +-------------------------------------------------------------+
 ```
@@ -296,7 +308,7 @@ V.A.R.U.N.A. is deployed on a decoupled, production-grade cloud architecture lev
 * **Deployment Details**:
   * **Native Python 3.11 Runtime**: Automated continuous deployment via `render.yaml` blueprint and `backend/requirements.txt`.
   * **Resilient Architecture**: Dual-execution design featuring Celery distributed task queues with seamless fallback to async background worker threads for standalone cloud hosting.
-  * **Full Forensic Pipeline**: Executes ESRGAN enhancement, U-Net contour segmentation, Fay's spreading model, Bonn Agreement volume estimation, Runge-Kutta 4th-order Lagrangian metocean hindcasting, and Bayesian AIS vessel liability scoring.
+  * **Full Forensic Pipeline**: Executes classical 4x image enhancement (ESRGAN pipeline stage), radar-vision segmentation (U-Net pipeline stage), Fay's spreading model, Bonn Agreement volume estimation, RK4 ensemble Lagrangian metocean hindcasting with uncertainty ellipse, and weighted multi-factor AIS vessel priority scoring.
 
 ### 3. Architecture & Security
 * **Cross-Origin Resource Sharing (CORS)**: Pre-configured across all endpoints, enabling secure browser-to-backend communication without proxy overhead.

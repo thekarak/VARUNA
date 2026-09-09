@@ -559,7 +559,7 @@ const initialPipelineStages = [
     id: "stage4",
     num: "04",
     name: "Vessel Correlation",
-    desc: "S-AIS / T-AIS kinematic dead-reckoning & Bayesian liability ranking",
+    desc: "S-AIS / T-AIS kinematic dead-reckoning & multi-factor priority ranking",
     status: "DONE",
     durationMs: 850
   }
