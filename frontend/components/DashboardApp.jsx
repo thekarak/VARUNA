@@ -344,14 +344,20 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
       map.removeLayer(tileLayerRef.current);
     }
 
-    const basemapSubpath = mapTheme === "dark" ? "dark_all" : "light_all";
-    // Keyless CARTO endpoint: the previously hardcoded ?key= token 403s every
-    // tile when invalid (the black-map symptom). If CARTO keeps failing, fall
-    // back to OSM standard tiles so the map always paints.
-    const tileLayer = L.tileLayer(`https://{s}.basemaps.cartocdn.com/${basemapSubpath}/{z}/{x}/{y}{r}.png`, {
-      subdomains: "abcd",
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+    // Provider comes from ForensicApi.selectBasemap (keyless OSM/Esri by
+    // default; CARTO only with a valid operator key — keyless CARTO answers
+    // with "API KEY REQUIRED" watermark tiles, and the old embedded key is
+    // dead). Any persistent tile failure swaps in the fallback provider so
+    // the map always paints.
+    const api = (typeof window !== "undefined" && window.ForensicApi) || null;
+    const provider = api ? api.selectBasemap(mapTheme) : {
+      primary: { url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", maxZoom: 19 },
+      fallback: { url: "https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/tiles/{z}/{y}/{x}", maxZoom: 13 }
+    };
+    const tileLayer = L.tileLayer(provider.primary.url, {
+      subdomains: provider.primary.subdomains || "abc",
+      maxZoom: provider.primary.maxZoom || 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a> & Esri'
     }).addTo(map);
 
     let tileErrors = 0;
@@ -364,13 +370,13 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
           const hostMap = mapInstanceRef.current;
           if (hostMap) {
             hostMap.removeLayer(tileLayer);
-            const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-              maxZoom: 19,
-              attribution: "&copy; OpenStreetMap contributors"
+            const fb = L.tileLayer(provider.fallback.url, {
+              maxZoom: provider.fallback.maxZoom || 19,
+              attribution: "&copy; OpenStreetMap contributors & Esri"
             }).addTo(hostMap);
-            tileLayerRef.current = osm;
+            tileLayerRef.current = fb;
           }
-        } catch (e) { /* keep CARTO layer on any error */ }
+        } catch (e) { /* keep primary layer on any error */ }
       }
     });
 

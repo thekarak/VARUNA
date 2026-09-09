@@ -322,6 +322,37 @@ const ForensicApi = {
     }, 6000);
   },
 
+
+  // Basemap provider selection (map-load fix): CARTO's free endpoint now
+  // answers keyless requests with "API KEY REQUIRED" watermark tiles (HTTP
+  // 200, so no error event fires), and the previously embedded key is dead.
+  // Default is therefore keyless providers that always serve real tiles;
+  // a VALID operator key in window.CARTO_API_KEY re-enables CARTO.
+  selectBasemap: function(theme) {
+    const DEAD_KEY = "cb1_2vlt_1_8a2a2b183412e738d2fe8ff8";
+    let key = "";
+    try { key = (typeof window !== "undefined" && window.CARTO_API_KEY) || ""; } catch (e) {}
+    const sub = (theme === "dark") ? "dark_all" : "light_all";
+    if (key && key !== DEAD_KEY) {
+      return {
+        primary: { url: "https://{s}.basemaps.cartocdn.com/" + sub + "/{z}/{x}/{y}{r}.png?key=" + key,
+                   subdomains: "abcd", maxZoom: 19 },
+        fallback: { url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", maxZoom: 19 }
+      };
+    }
+    if (theme === "dark") {
+      return {
+        primary: { url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+                   maxZoom: 16 },
+        fallback: { url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", maxZoom: 19 }
+      };
+    }
+    return {
+      primary: { url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", maxZoom: 19 },
+      fallback: { url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", maxZoom: 18 }
+    };
+  },
+
   runDetectionPipeline: function(params = {}, onProgress, onBackendVessels) {
     const scenarioId = params.scenarioId || "hormuz";
     const scenarios = window.mockScenarios || [];

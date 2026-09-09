@@ -24,7 +24,7 @@ A particularly elusive scenario occurs when a commercial vessel intentionally di
 * **Lagrangian Ocean Drift Hindcasting**: Backwards-in-time hydrodynamic advection powered by NOAA GFS wind forcing and Copernicus Marine (CMEMS) ocean surface currents.
 * **PostGIS Spatio-Temporal AIS Correlation**: High-performance spatial querying (`ST_DWithin`, `ST_Intersects`) over historical maritime trajectories.
 * **Weighted Multi-Factor Priority Scoring**: Gaussian CPA distance decay, AIS blackout duration penalties, kinematic speed drop anomalies, and abrupt course alteration metrics.
-* **Interactive Tactical GIS Canvas**: Powered by **CARTO Basemaps** and Leaflet with animated radar pings, multi-node fluid lobe polygons, and CPA-annotated vessel paths.
+* **Interactive Tactical GIS Canvas**: Powered by Leaflet with dynamic multi-provider basemaps (**OpenStreetMap**, **Esri World Ocean / Dark Canvas**, and **CARTO Basemaps**), animated radar pings, multi-node fluid lobe polygons, and CPA-annotated vessel paths.
 * **3D Mission Landing Page**: 60 FPS Three.js WebGL globe featuring procedural ocean particle advection and atmospheric glow.
 * **Automated Forensic Case File PDF Generation**: Court-admissible evidence documentation with SHA-256 digital integrity verification.
 
@@ -297,7 +297,7 @@ V.A.R.U.N.A. is deployed on a decoupled, production-grade cloud architecture lev
   * **Zero-Latency Edge CDN**: Serves static WebGL assets, satellite overlays, and React components with sub-50ms global response times.
   * **Clean URL Routing**: Configured via `frontend/vercel.json` with clean routing (`/dashboard` $\to$ `dashboard.html`, `/` $\to$ `index.html`).
   * **Dynamic API Resolution**: Automatically connects to the live Render backend (`https://varuna-e1tx.onrender.com`) with client-side scientific fallback.
-  * **CARTO Basemap Integration**: Native support for CARTO Positron Light and Dark Matter vector tile layers with dynamic real-time theme toggling.
+  * **Multi-Provider Resilient Basemaps**: Seamless failover between high-resolution OpenStreetMap, Esri World Ocean / Dark Canvas, and CARTO Basemaps, guaranteeing zero black-tile or watermark failures across all devices.
 
 ### 2. Backend on Render
 * **Platform**: [Render](https://render.com)

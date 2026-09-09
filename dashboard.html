@@ -139,7 +139,11 @@
   <div id="root"></div>
 
   <script>
-    window.CARTO_API_KEY = "cb1_2vlt_1_8a2a2b183412e738d2fe8ff8";
+    // Optional: paste a VALID CARTO basemap key here to use CARTO tiles.
+    // The previous embedded key is dead (CARTO answers it with
+    // "API KEY REQUIRED" watermark tiles), so it is left EMPTY and
+    // the map uses keyless OSM/Esri providers by default.
+    window.CARTO_API_KEY = "";
   </script>
   <script src="services/mockData.js"></script>
   <script src="services/forensicApi.js"></script>
