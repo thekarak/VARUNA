@@ -999,7 +999,7 @@ function App() {
   const finalRef = useRef(null);
 
   const handleGetStarted = () => {
-    window.location.href = "dashboard.html";
+    window.location.href = "login.html";
   };
 
   useEffect(() => {
@@ -2165,8 +2165,13 @@ function App() {
             <span className="text-slate-400">MARITIME FORENSIC ATTRIBUTION ENGINE</span>
           </div>
           <div className="flex items-center gap-6 text-[11px]">
+            <a href="login.html" className="text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1.5 font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+              NTRO ACCESS PORTAL
+            </a>
+            <span className="text-slate-600">|</span>
             <a href="dashboard.html" className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1.5 font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
               FORENSIC DASHBOARD
             </a>
             <span className="text-slate-600">|</span>

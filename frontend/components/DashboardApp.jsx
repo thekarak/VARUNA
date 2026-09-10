@@ -1260,8 +1260,26 @@ function DashboardApp() {
   const [backendMeta, setBackendMeta] = useState(null);
   const [showCoastGuardModal, setShowCoastGuardModal] = useState(false);
   const [coastGuardDispatch, setCoastGuardDispatch] = useState(null);
-  const [targetVesselForReport, setTargetVesselForReport] = useState(null);
   const [timeString, setTimeString] = useState(new Date().toUTCString());
+
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem("varuna_auth");
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return {
+      user: "Officer A. Sharma",
+      role: "NTRO Maritime Surveillance Commander",
+      aadhaarMasked: "•••• •••• 9012",
+      badgeId: "NTRO-MS-4890",
+      clearance: "LEVEL 4"
+    };
+  });
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("varuna_auth");
+    window.location.href = "login.html";
+  };
 
   useEffect(() => {
     ForensicApi.getOperationalScenarios().then((res) => {
@@ -1409,6 +1427,32 @@ function DashboardApp() {
             className="px-3.5 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 font-mono text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer flex items-center gap-1.5 shadow-cyan-glow"
           >
             <span>CASE FILE (PDF)</span>
+          </button>
+
+          <div className="hidden xl:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-cyan-500/30 font-mono text-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <div className="text-left leading-tight">
+              <div className="text-[11px] font-bold text-white flex items-center gap-1.5">
+                <span>{currentUser.user}</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-normal">
+                  {currentUser.clearance || "LEVEL 4"}
+                </span>
+              </div>
+              <div className="text-[10px] text-slate-400">
+                UID: {currentUser.aadhaarMasked || "•••• •••• 9012"} &bull; {currentUser.badgeId || "NTRO-MS-4890"}
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 hover:text-rose-100 border border-rose-500/40 font-mono text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer flex items-center gap-1.5"
+            title="Sign out and return to NTRO Login Portal"
+          >
+            <svg className="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span className="hidden sm:inline">LOGOUT</span>
           </button>
         </div>
       </header>
