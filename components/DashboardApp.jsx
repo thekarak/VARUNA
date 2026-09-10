@@ -342,7 +342,25 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
     mapInstanceRef.current = map;
     layerGroupRef.current = layerGroup;
 
+    // Partial-render fix: Leaflet snapshots the container size at init, but
+    // Tailwind-CDN classes (e.g. h-[580px]) and fonts apply AFTER that, so the
+    // cached viewport stays small and only a top strip of tiles ever loads.
+    // Re-sync size on timers (outlasts CDN/font layout), on window resize,
+    // and tear everything down on unmount.
+    const syncSize = () => {
+      try {
+        const m = mapInstanceRef.current;
+        if (m) m.invalidateSize();
+      } catch (e) {}
+    };
+    const t1 = setTimeout(syncSize, 350);
+    const t2 = setTimeout(syncSize, 1500);
+    window.addEventListener("resize", syncSize);
+
     return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener("resize", syncSize);
       map.remove();
       mapInstanceRef.current = null;
       layerGroupRef.current = null;
@@ -403,10 +421,16 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
     const layerGroup = layerGroupRef.current;
     if (!map || !layerGroup) return;
 
+    // Re-sync before every redraw (scenario/theme/vessel change) and once
+    // more when the fly animation lands, so new tiles cover the full pane.
+    try { map.invalidateSize(); } catch (e) {}
     layerGroup.clearLayers();
     map.flyTo([activeScenario.lat, activeScenario.lng], activeScenario.zoom || 11, {
       duration: 1.4,
       easeLinearity: 0.25
+    });
+    map.once("moveend", () => {
+      try { map.invalidateSize(); } catch (e) {}
     });
 
     const isLight = mapTheme === "light";
@@ -559,7 +583,7 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
   }, [activeScenario, vessels, selectedVessel, mapTheme]);
 
   return (
-    <div className={`relative w-full h-[580px] lg:h-[650px] rounded-2xl overflow-hidden border border-white/10 ${mapTheme === "light" ? "bg-[#e2e8f0]" : "bg-[#04070d]"} shadow-2xl transition-colors duration-300`}>
+    <div style={{ minHeight: 580 }} className={`relative w-full h-[580px] lg:h-[650px] rounded-2xl overflow-hidden border border-white/10 ${mapTheme === "light" ? "bg-[#e2e8f0]" : "bg-[#04070d]"} shadow-2xl transition-colors duration-300`}>
       <div ref={mapContainerRef} className="w-full h-full z-10" />
 
       <div className="absolute top-4 left-4 z-20 pointer-events-auto bg-[#070c14]/92 backdrop-blur-xl border border-cyan-500/30 rounded-xl p-3.5 shadow-2xl font-mono text-[10px] space-y-2 max-w-[220px]">

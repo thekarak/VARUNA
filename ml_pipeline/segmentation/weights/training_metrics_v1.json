@@ -46,5 +46,47 @@
     ]
   },
   "checkpoint": "varuna_oil_cnn_v1.pt",
-  "size_bytes": 1195773
+  "size_bytes": 1195773,
+  "lookalike_v2": {
+    "model": "stage1 v1 decision + stage2 look-alike review flag (recall-preserving)",
+    "mined_negatives": 807,
+    "v1_alone_test": {
+      "split": "v1-alone-test",
+      "n": 554,
+      "threshold": 0.55,
+      "accuracy": 0.8051,
+      "auc": 0.8704,
+      "f1": 0.7327,
+      "precision_oil": 0.6727,
+      "recall_oil": 0.8043,
+      "precision_clean": 0.8922,
+      "recall_clean": 0.8054,
+      "confusion_matrix": [
+        [
+          298,
+          72
+        ],
+        [
+          36,
+          148
+        ]
+      ]
+    },
+    "modulator_test": {
+      "split": "modulator-test(held-out)",
+      "n": 554,
+      "thresholds": {
+        "stage1": 0.55,
+        "stage2": 0.15
+      },
+      "v1_positives": 220,
+      "confirmed": 205,
+      "review_flagged": 15,
+      "keep_rate_on_v1_true_positives": 0.9595,
+      "flag_rate_on_v1_false_positives": 0.125,
+      "confirmed_subset_oil_precision": 0.6927,
+      "v1_oil_precision": 0.6727,
+      "v1_oil_recall_unchanged": 0.8043
+    }
+  }
 }
