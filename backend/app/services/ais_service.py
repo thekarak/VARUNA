@@ -373,6 +373,11 @@ def _score_vessel_list(
             "anomalies": anomalies,
             "speed_at_cpa_kts": round(cpa_spd, 1),
             "cruising_speed_kts": round(cruise_spd, 1),
+            # Real measured per-ping speed series (chronological, last 12 in
+            # window) so the UI kinematics chart plots observations, not
+            # synthesized curves, whenever trajectory records exist.
+            "speed_series_kts": [round(float(p.get("sog_kts", 0.0)), 1)
+                                 for p in pings[-12:]],
             "path": path_coords[:8]  # Tactical display polyline
         })
 

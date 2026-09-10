@@ -1,0 +1,50 @@
+{
+  "model": "varuna_oil_cnn_v1 (image-level oil-presence CNN + CAM; NOT pixel-supervised U-Net)",
+  "dataset": "Sentinel-1 SAR Oil Spill Detection Dataset (CSIRO DAP, Asia-Pacific)",
+  "val": {
+    "split": "val",
+    "n": 554,
+    "threshold": 0.55,
+    "accuracy": 0.787,
+    "auc": 0.8233,
+    "f1": 0.7108,
+    "precision_oil": 0.6502,
+    "recall_oil": 0.7838,
+    "precision_clean": 0.8792,
+    "recall_clean": 0.7886,
+    "confusion_matrix": [
+      [
+        291,
+        78
+      ],
+      [
+        40,
+        145
+      ]
+    ]
+  },
+  "test": {
+    "split": "test(held-out)",
+    "n": 554,
+    "threshold": 0.55,
+    "accuracy": 0.8051,
+    "auc": 0.8704,
+    "f1": 0.7327,
+    "precision_oil": 0.6727,
+    "recall_oil": 0.8043,
+    "precision_clean": 0.8922,
+    "recall_clean": 0.8054,
+    "confusion_matrix": [
+      [
+        298,
+        72
+      ],
+      [
+        36,
+        148
+      ]
+    ]
+  },
+  "checkpoint": "varuna_oil_cnn_v1.pt",
+  "size_bytes": 1195773
+}

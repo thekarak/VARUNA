@@ -815,15 +815,24 @@ function VesselDetailModal({ vessel, onClose }) {
             SPEED HISTORY KINEMATICS (HOURLY SAMPLE)
           </span>
           <div className="h-24 w-full bg-black/50 rounded-xl p-3 border border-white/5 flex items-end gap-1.5">
-            {vessel.speedHistory && vessel.speedHistory.map((spd, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
+            {vessel.speedHistory && vessel.speedHistory.map((spdRaw, i) => {
+              // Audit fix (empty bars): % heights collapse inside auto-height
+              // flex columns (indefinite containing block computes to ~0px),
+              // which is why labels rendered but bars were invisible. Use px
+              // heights against the fixed h-24 track, with numeric coercion
+              // so string values can never produce NaN heights.
+              const spd = Number(spdRaw) || 0;
+              const barH = Math.max(3, Math.min(52, (spd / 20) * 52));
+              return (
+              <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1 h-full">
                 <div
                   className={`w-full rounded-t transition-all duration-300 ${spd < 10 ? "bg-rose-500" : "bg-cyan-400"}`}
-                  style={{ height: `${(spd / 20) * 100}%` }}
+                  style={{ height: `${barH}px` }}
                 />
                 <span className="text-[8px] text-slate-500">{spd}k</span>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

@@ -34,6 +34,10 @@ def segment_scene(scene_path, lat, lon):
 def main():
     print("=== GAP-1 VERTICAL SLICE: real pixels in, measured geometry out ===")
     sr1, seg1 = segment_scene("data/sar/sentinel1_sample_slick.png", 19.0, 72.8)
+    assert seg1.get("segmentation_source") in ("learned-cnn-cam-refined", "classical"), \
+        "segmentation_source missing"
+    print("segmentation_source:", seg1.get("segmentation_source"),
+          "| cnn_p_oil:", seg1.get("classifier_p_oil"))
     print(f"scene A: {sr1['input_shape_hw']} -> {sr1['output_shape_hw']}, "
           f"area={seg1['area_sq_m']} m2, peri={seg1['perimeter_m']} m, "
           f"verts={len(seg1['polygon'])}, age={seg1['spill_age_hours']}h")

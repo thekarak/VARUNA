@@ -635,6 +635,8 @@ def run_varuna_forensic_pipeline(
         "weathering_stage": segmentation_results.get("weathering_stage", "Active Dispersion"),
         "slick_percentage": segmentation_results["slick_percentage"],
         "confidence_score": segmentation_results["confidence_score"],
+        "segmentation_source": segmentation_results.get("segmentation_source", "classical"),
+        "classifier_p_oil": segmentation_results.get("classifier_p_oil"),
         "estimated_volume_bbls": segmentation_results["estimated_volume_bbls"],
         "volume_bbls_range": segmentation_results.get("volume_bbls_range"),
         "volume_assumptions": segmentation_results.get("volume_assumptions"),

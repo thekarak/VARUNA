@@ -1,14 +1,18 @@
 """
 Segmentation stage ("U-Net stage") for SAR Oil Spill Detection.
 
-HONEST STATUS (SIH audit): the production design calls for trained U-Net
-weights (PyTorch). Those weights are NOT bundled in this prototype, so this
-stage runs a REAL classical radar-vision chain on the ACTUAL input pixels —
-bilateral speckle filtering, adaptive dark-spot thresholding, morphology and
-contour extraction. Every geometric output (area, perimeter, polygon,
-centroid) is measured from the input image, never hard-coded. Production
-swaps this function body for trained U-Net inference; the contract is
-unchanged. Compliant with SIH PS 26143 (NTRO) specifications.
+HONEST STATUS (SIH audit, updated): v1 trained weights ARE bundled
+(`weights/varuna_oil_cnn_v1.pt` — image-level oil-presence CNN + CAM,
+trained on the Sentinel-1 SAR Oil Spill Detection Dataset; see
+`training_metrics_v1.json` and `train_oil_classifier.py`). When torch and the
+checkpoint are available, the classifier confirms oil presence and its CAM
+heatmap refines the classical contour (`segmentation_source =
+"learned-cnn-cam-refined"`); otherwise the REAL classical radar-vision chain
+runs alone (`"classical"`). Every geometric output (area, perimeter, polygon,
+centroid) is measured from the input image, never hard-coded. This is still
+NOT a pixel-supervised U-Net — no mask labels exist in the dataset — and
+look-alike (biogenic/low-wind) discrimination is future work. Compliant with
+SIH PS 26143 (NTRO) specifications.
 """
 
 import os
@@ -59,6 +63,102 @@ def load_or_fetch_sar_image(image_input: str) -> np.ndarray:
     ocean = np.random.gamma(shape=4, scale=35.0, size=(height, width)).astype(np.uint8)
     cv2.ellipse(ocean, (245, 260), (110, 55), -28, 0, 360, 32, -1)
     return ocean
+
+
+_CNN_CACHE: Dict[str, Any] = {}
+_CNN_DEFAULT_WEIGHTS = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "weights", "varuna_oil_cnn_v1.pt")
+
+
+def _build_cnn_arch():
+    """Rebuilds the exact v1 OilCNN-GAP-16/32/64/128 arch (torch imported lazily)."""
+    import torch
+    import torch.nn as nn
+
+    def block(cin: int, cout: int):
+        return nn.Sequential(
+            nn.Conv2d(cin, cout, 3, padding=1, bias=False),
+            nn.BatchNorm2d(cout),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(cout, cout, 3, padding=1, bias=False),
+            nn.BatchNorm2d(cout),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2),
+        )
+
+    class OilCNN(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.features = nn.Sequential(
+                block(1, 16), block(16, 32), block(32, 64), block(64, 128))
+            self.gap = nn.AdaptiveAvgPool2d(1)
+            self.fc = nn.Linear(128, 2)
+
+        def forward(self, x):
+            f = self.features(x)
+            return self.fc(self.gap(f).flatten(1)), f
+
+    return OilCNN()
+
+
+def _load_oil_cnn():
+    """Loads the v1 classifier once; None when torch/weights are absent.
+
+    torch is an OPTIONAL dependency (NOT in requirements.txt) so Render and
+    CPU-only hosts keep working via the classical path.
+    """
+    if "model" in _CNN_CACHE:
+        return _CNN_CACHE["model"]
+    try:
+        import torch
+    except Exception:
+        _CNN_CACHE["model"] = None
+        return None
+    path = os.getenv("OIL_CNN_WEIGHTS", _CNN_DEFAULT_WEIGHTS)
+    try:
+        ckpt = torch.load(path, map_location="cpu")
+        model = _build_cnn_arch()
+        model.load_state_dict(ckpt["state_dict"])
+        model.eval()
+        entry = {
+            "model": model,
+            "img_size": int(ckpt.get("img_size", 192)),
+            "mean": float(ckpt.get("mean", 0.5)),
+            "std": float(ckpt.get("std", 0.25)),
+            "threshold": float(ckpt.get("threshold", 0.5)),
+        }
+        _CNN_CACHE["model"] = entry
+        return entry
+    except Exception:
+        _CNN_CACHE["model"] = None
+        return None
+
+
+def _cnn_classify(gray: np.ndarray):
+    """Runs the v1 classifier + CAM; None when weights/torch unavailable.
+
+    Returns dict(p_oil, threshold, cam01 full-resolution heatmap).
+    """
+    entry = _load_oil_cnn()
+    if entry is None:
+        return None
+    import torch
+    size = entry["img_size"]
+    small = cv2.resize(gray, (size, size), interpolation=cv2.INTER_AREA)
+    x = torch.from_numpy(
+        ((small.astype(np.float32) / 255.0) - entry["mean"]) / entry["std"]
+    ).unsqueeze(0).unsqueeze(0)
+    with torch.no_grad():
+        logits, feats = entry["model"](x)
+        p_oil = float(torch.softmax(logits, 1)[0, 1])
+        w = entry["model"].fc.weight[1].detach()
+        cam = torch.relu((feats[0] * w[:, None, None]).sum(0)).cpu().numpy()
+    cam = cam - cam.min()
+    if cam.max() > 0:
+        cam = cam / cam.max()
+    cam_full = cv2.resize(cam, (gray.shape[1], gray.shape[0]),
+                          interpolation=cv2.INTER_LINEAR)
+    return {"p_oil": round(p_oil, 4), "threshold": entry["threshold"], "cam": cam_full}
 
 
 def estimate_spill_age_fay(
@@ -134,6 +234,29 @@ def execute_unet_segmentation(
     kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
     cleaned_mask = cv2.morphologyEx(binary_mask, cv2.MORPH_OPEN, kernel_open)
     cleaned_mask = cv2.morphologyEx(cleaned_mask, cv2.MORPH_CLOSE, kernel_close)
+
+    # 4b. Learned confirmation (v1 CNN + CAM heatmap). When the trained
+    # classifier agrees oil is present, intersect the classical mask with the
+    # hot CAM region so the contour follows learned evidence; otherwise the
+    # classical mask stands (torch/weights absence also lands here safely).
+    segmentation_source = "classical"
+    cnn_p_oil = None
+    cnn_threshold = None
+    cnn_agrees = None
+    cnn_info = _cnn_classify(raw_img)
+    if cnn_info is not None:
+        cnn_p_oil = cnn_info["p_oil"]
+        cnn_threshold = cnn_info["threshold"]
+        cnn_agrees = bool(cnn_p_oil >= cnn_threshold)
+        if cnn_agrees:
+            hot = (cnn_info["cam"] > 0.35).astype(np.uint8) * 255
+            hot = cv2.dilate(hot,
+                             cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)),
+                             iterations=1)
+            refined = cv2.bitwise_and(cleaned_mask, cleaned_mask, mask=hot)
+            if int(np.count_nonzero(refined)) >= 50:
+                cleaned_mask = refined
+                segmentation_source = "learned-cnn-cam-refined"
 
     # 5. Extract contours of segmented oil slicks
     contours, _ = cv2.findContours(cleaned_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -269,6 +392,10 @@ def execute_unet_segmentation(
     # Total slick coverage percentage in satellite tile
     slick_percentage = round((pixel_area / float(w * h)) * 100.0, 2)
     confidence_score = round(max(85.0, min(99.2, 91.0 + (damping_ratio * 2.2))), 1)
+    if cnn_info is not None and not cnn_agrees:
+        # Trained classifier sees no oil: cap confidence so weak evidence
+        # cannot present as near-certain (clean-sea false-positive guard).
+        confidence_score = round(min(confidence_score, 65.0), 1)
 
     return {
         "area_sq_m": area_sq_m,
@@ -278,6 +405,10 @@ def execute_unet_segmentation(
         "detection_quality": detection_quality,
         "slick_percentage": slick_percentage,
         "confidence_score": confidence_score,
+        "segmentation_source": segmentation_source,
+        "classifier_p_oil": cnn_p_oil,
+        "classifier_threshold": cnn_threshold,
+        "cnn_agrees": cnn_agrees,
         "estimated_volume_bbls": volume_barrels,
         "volume_bbls_range": volume_bbls_range,
         "volume_m3": volume_m3,

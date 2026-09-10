@@ -266,14 +266,29 @@ const ForensicApi = {
         status: (blackoutH > 0 && i >= 1 && i <= 3) ? "blackout_interpolated" : "active",
         time: "T-" + ((rawPath.length - 1 - i) * 2) + "h"
       }));
-      const hist = [];
-      for (let k = 0; k < 12; k++) {
-        let s;
-        if (k < 3) s = cruise;
-        else if (k < 5) s = cruise - (cruise - disch) * ((k - 2) / 2);
-        else if (k < 8) s = disch;
-        else s = disch + (cruise - disch) * ((k - 7) / 4);
-        hist.push(parseFloat(s.toFixed(1)));
+      // Prefer the measured per-ping speed series from the backend when
+      // present (real kinematics); otherwise synthesize the cruise-dip-recover
+      // curve from cruise/discharge speeds (demo data, same as before).
+      const rawSeries = Array.isArray(bv.speed_series_kts)
+        ? bv.speed_series_kts.filter((x) => Number.isFinite(Number(x)))
+            .map((x) => parseFloat(Number(x).toFixed(1)))
+        : [];
+      let hist;
+      if (rawSeries.length > 0) {
+        const tail = rawSeries.slice(-12);
+        hist = tail.length < 12
+          ? new Array(12 - tail.length).fill(tail[0]).concat(tail)
+          : tail;
+      } else {
+        hist = [];
+        for (let k = 0; k < 12; k++) {
+          let s;
+          if (k < 3) s = cruise;
+          else if (k < 5) s = cruise - (cruise - disch) * ((k - 2) / 2);
+          else if (k < 8) s = disch;
+          else s = disch + (cruise - disch) * ((k - 7) / 4);
+          hist.push(parseFloat(s.toFixed(1)));
+        }
       }
       const score = (bv.score != null) ? bv.score : 0;
       const vtype = bv.vessel_type || "Merchant Vessel";
