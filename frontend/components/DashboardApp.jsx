@@ -602,6 +602,44 @@ function LeafletMapView({ activeScenario, vessels, selectedVessel, onSelectVesse
 }
 
 function CaseFileModal({ isOpen, onClose, scenario, vessels, metrics }) {
+  // Audit fix: dossier metadata is derived from the live payload on every
+  // opening — never fixed strings. Hooks run before the early return.
+  const [openedAt, setOpenedAt] = React.useState(() => new Date().toISOString());
+  const [seal, setSeal] = React.useState({ hex: "COMPUTING…", algo: "SHA-256" });
+  const prevOpen = React.useRef(false);
+  if (isOpen && !prevOpen.current) {
+    setOpenedAt(new Date().toISOString());
+  }
+  prevOpen.current = isOpen;
+  const fnv1a = (str) => {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+    return (h >>> 0).toString(16).padStart(8, "0");
+  };
+  const caseDay = openedAt.slice(0, 10).replace(/-/g, "");
+  const caseSeed = ((scenario && scenario.lat) || 0) + ":" + ((scenario && scenario.lng) || 0) + ":" + openedAt;
+  const caseRef = "#VARUNA-" + caseDay + "-" + fnv1a(caseSeed).slice(0, 6).toUpperCase();
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const api = (typeof window !== "undefined" && window.ForensicApi) || null;
+    const canonical = {
+      caseRef: caseRef,
+      openedAt: openedAt,
+      lat: scenario && scenario.lat,
+      lng: scenario && scenario.lng,
+      metrics: metrics ? {
+        areaKm2: metrics.areaKm2,
+        spillAgeHours: metrics.spillAgeHours,
+        estimatedVolumeBbl: metrics.estimatedVolumeBbl
+      } : null,
+      vessels: (vessels || []).map((v) => ({ mmsi: v.mmsi, score: v.riskScore }))
+    };
+    if (api && api.computeSeal) {
+      api.computeSeal(canonical).then(setSeal);
+    } else {
+      setSeal({ hex: "fnv1a-" + fnv1a(JSON.stringify(canonical)), algo: "FNV1A-FALLBACK" });
+    }
+  }, [isOpen, openedAt]);
   if (!isOpen) return null;
 
   const topVessel = vessels && vessels.length > 0 ? vessels[0] : null;
@@ -621,7 +659,7 @@ function CaseFileModal({ isOpen, onClose, scenario, vessels, metrics }) {
             </span>
             <span className="text-slate-500 font-mono text-xs">|</span>
             <span className="font-mono text-xs tracking-widest text-slate-300 uppercase print:text-gray-700 font-semibold">
-              MARPOL ANNEX I FORENSIC ADMISSIBILITY DOSSIER
+              MARPOL ANNEX I INVESTIGATIVE LEAD DOSSIER
             </span>
           </div>
           <div className="flex items-center gap-3 print:hidden">
@@ -643,11 +681,11 @@ function CaseFileModal({ isOpen, onClose, scenario, vessels, metrics }) {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] mb-6 font-mono text-xs print:border-gray-300 print:bg-gray-50">
           <div>
             <span className="text-slate-500 text-[10px] block font-medium">DOSSIER CASE REF</span>
-            <span className="font-bold text-white print:text-black">#V.A.R.U.N.A-MED-08492</span>
+            <span className="font-bold text-white print:text-black">{caseRef}</span>
           </div>
           <div>
             <span className="text-slate-500 text-[10px] block font-medium">TIMESTAMP (UTC)</span>
-            <span className="font-bold text-cyan-300 print:text-black">2026-09-04T12:08:44Z</span>
+            <span className="font-bold text-cyan-300 print:text-black">{openedAt}</span>
           </div>
           <div>
             <span className="text-slate-500 text-[10px] block font-medium">TARGET MARITIME REGION</span>
@@ -655,7 +693,7 @@ function CaseFileModal({ isOpen, onClose, scenario, vessels, metrics }) {
           </div>
           <div>
             <span className="text-slate-500 text-[10px] block font-medium">LEGAL STATUS</span>
-            <span className="font-bold text-emerald-400 print:text-green-700">BURDEN OF PROOF MET</span>
+            <span className="font-bold text-amber-400 print:text-black">INVESTIGATIVE LEAD — NOT EVIDENCE</span>
           </div>
         </div>
 
@@ -717,8 +755,8 @@ function CaseFileModal({ isOpen, onClose, scenario, vessels, metrics }) {
           )}
 
           <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between font-mono text-[10px] text-slate-500 print:border-black print:text-black">
-            <span>SHA-256 SEAL: 9e8a7c1b4d0e2f5a8c3b1e9d7f5a2c4e6b8a0d2f4a6c8e0b2d4f6a8c0e2b4d6</span>
-            <span>V.A.R.U.N.A SECURE CHAIN OF CUSTODY</span>
+            <span>{`SEAL (${seal.algo}): ${seal.hex}`}</span>
+            <span>V.A.R.U.N.A DEMO CHAIN OF CUSTODY (LOCAL ONLY)</span>
           </div>
         </div>
 
@@ -904,7 +942,7 @@ function CoastGuardModal({ isOpen, onClose, scenario, vessels, metrics, lastDisp
                 </span>
               </div>
               <span className="text-[10px] text-slate-400 block mt-0.5">
-                MARITIME RESCUE COORDINATION CENTRE (MRCC) TELEGRAM & INTERCEPT ORDER
+                MARITIME RESCUE COORDINATION CENTRE (MRCC) TELEGRAM DRAFT (SIMULATED — DEMO ONLY)
               </span>
             </div>
           </div>
@@ -1085,7 +1123,7 @@ function CoastGuardModal({ isOpen, onClose, scenario, vessels, metrics, lastDisp
             <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="text-[10px] text-slate-400">
                 <span>CHAIN OF CUSTODY: </span>
-                <span className="text-cyan-400 font-mono">SHA-256 ENCRYPTED · ADMISSIBLE UNDER MARPOL ANNEX I</span>
+                <span className="text-cyan-400 font-mono">LOCAL DEMO LOG · NOT ADMISSIBLE EVIDENCE</span>
               </div>
 
               <button
@@ -1127,15 +1165,15 @@ function CoastGuardModal({ isOpen, onClose, scenario, vessels, metrics, lastDisp
                   </div>
                   <div>
                     <h4 className="text-base font-bold text-white uppercase tracking-wider">
-                      ALERT TRANSMITTED & ACKNOWLEDGED BY COAST GUARD
+                      SIMULATED ALERT — DEMO ONLY (NO EXTERNAL TRANSMISSION)
                     </h4>
                     <span className="text-xs text-emerald-400">
-                      INCIDENT DOCKET SEALED AND DISPATCHED
+                      INCIDENT DOCKET RECORDED LOCALLY
                     </span>
                   </div>
                 </div>
                 <span className="text-[10px] text-emerald-300 font-bold px-2.5 py-1 rounded bg-emerald-900/60 border border-emerald-500/40">
-                  DISPATCH CONFIRMED
+                  DEMO RECORD
                 </span>
               </div>
 
@@ -1209,6 +1247,8 @@ function DashboardApp() {
   const [selectedVessel, setSelectedVessel] = useState(null);
   const [metrics, setMetrics] = useState(null);
   const [showCaseFile, setShowCaseFile] = useState(false);
+  // Live-backend provenance for the suspect panel; null = local simulation.
+  const [backendMeta, setBackendMeta] = useState(null);
   const [showCoastGuardModal, setShowCoastGuardModal] = useState(false);
   const [coastGuardDispatch, setCoastGuardDispatch] = useState(null);
   const [targetVesselForReport, setTargetVesselForReport] = useState(null);
@@ -1287,8 +1327,9 @@ function DashboardApp() {
       (updatedStages) => {
         setPipelineStages(updatedStages);
       },
-      (backendVessels) => {
+      (backendVessels, meta) => {
         setVessels(backendVessels);
+        if (meta) setBackendMeta(meta);
       }
     ).then((result) => {
       setIsRunningPipeline(false);
@@ -1654,6 +1695,9 @@ function DashboardApp() {
                 SUSPECT VESSELS RANKED ({vessels.length})
               </span>
               <span className="text-slate-500 font-mono text-[10px]">SORTED BY PRIORITY SCORE</span>
+              <span className={`font-mono text-[10px] font-bold ${backendMeta && backendMeta.attribution_source === "postgis-spatial-join" ? "text-emerald-400" : backendMeta ? "text-amber-400" : "text-slate-500"}`}>
+                DATA: {backendMeta ? backendMeta.attribution_source : "LOCAL SIMULATION"}
+              </span>
             </div>
 
             <div className="space-y-2.5 max-h-[580px] lg:max-h-[650px] overflow-y-auto pr-1 font-mono">

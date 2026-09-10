@@ -5,12 +5,33 @@ function Loader({ onComplete }) {
   const [isExiting, setIsExiting] = useState(false);
   const [telemetryText, setTelemetryText] = useState("CALIBRATING ORBITAL SAR SENSORS");
 
+  // Audit fix (loader stuck at 0%): requestAnimationFrame halts in
+  // background/hidden tabs, freezing progress forever. Drive the bar with
+  // elapsed wall-clock time on a timer instead, nudge on visibility change,
+  // and force completion on an absolute deadline no matter what stalls.
   useEffect(() => {
-    const startTime = performance.now();
+    const startTime = (typeof performance !== "undefined" && performance.now)
+      ? performance.now()
+      : Date.now();
     const duration = 2000;
+    const deadline = 6000;
+    let finished = false;
 
-    let animId;
-    const updateProgress = (now) => {
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      setProgress(100);
+      setIsExiting(true);
+      setTimeout(() => {
+        if (onComplete) onComplete();
+      }, 500);
+    };
+
+    const tick = () => {
+      if (finished) return;
+      const now = (typeof performance !== "undefined" && performance.now)
+        ? performance.now()
+        : Date.now();
       const elapsed = now - startTime;
       const rawPct = Math.min(100, Math.floor((elapsed / duration) * 100));
       setProgress(rawPct);
@@ -27,19 +48,25 @@ function Loader({ onComplete }) {
         setTelemetryText("V.A.R.U.N.A PLATFORM VERIFIED // SYSTEM ONLINE");
       }
 
-      if (elapsed < duration) {
-        animId = requestAnimationFrame(updateProgress);
-      } else {
-        setProgress(100);
-        setIsExiting(true);
-        setTimeout(() => {
-          if (onComplete) onComplete();
-        }, 500);
+      if (elapsed >= duration) {
+        finish();
       }
     };
 
-    animId = requestAnimationFrame(updateProgress);
-    return () => cancelAnimationFrame(animId);
+    const timerId = setInterval(tick, 50);
+    const onVis = () => tick();
+    if (typeof document !== "undefined" && document.addEventListener) {
+      document.addEventListener("visibilitychange", onVis);
+    }
+    const deadlineId = setTimeout(finish, deadline);
+    tick();
+    return () => {
+      clearInterval(timerId);
+      clearTimeout(deadlineId);
+      if (typeof document !== "undefined" && document.removeEventListener) {
+        document.removeEventListener("visibilitychange", onVis);
+      }
+    };
   }, []);
 
   return (

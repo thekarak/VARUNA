@@ -141,13 +141,18 @@ def execute_unet_segmentation(
     # Filter out tiny noise blobs (< 50 pixels)
     valid_contours = [cnt for cnt in contours if cv2.contourArea(cnt) >= 50]
 
+    detection_quality = "measured-contour"
     if not valid_contours:
         # Fallback: if no large anomaly found, segment largest component
         valid_contours = sorted(contours, key=cv2.contourArea, reverse=True)[:1]
+        detection_quality = "largest-component-fallback"
 
     if valid_contours:
         primary_contour = max(valid_contours, key=cv2.contourArea)
     else:
+        # SIH audit: this branch fabricates geometry on uniform scenes — it
+        # must be flagged, never presented as a measurement.
+        detection_quality = "synthetic-fallback-uniform-scene"
         # Emergency synthetic contour if image was completely uniform
         center_x, center_y = int(w / 2), int(h / 2)
         primary_contour = np.array([
@@ -226,13 +231,33 @@ def execute_unet_segmentation(
         geo_polygon.append(geo_polygon[0])  # Close polygon
 
     # 8. Physical Volume Estimation according to Bonn Agreement (BAOAC)
-    # Real slick thickness derived from radar damping ratio and age
+    # Real slick thickness derived from radar damping ratio and age.
+    # SIH audit: a single BBL number overstates certainty, so report the
+    # central estimate PLUS a range from damping uncertainty (±25% radar
+    # damping spread) and state the assumptions explicitly. This is a
+    # prototype estimate, not a validated oil mass balance.
     damping_ratio = float(np.mean(filtered[cleaned_mask == 0])) / max(1.0, float(np.mean(filtered[cleaned_mask > 0])))
+
+    def _thickness(damp: float) -> float:
+        return max(55.0, min(350.0, 75.0 + (damp - 1.0) * 65.0))
+
+    def _volume_bbls(thick_um: float) -> float:
+        return round((area_sq_m * (thick_um * 1e-6) * 1000.0) / 158.987, 1)
+
     # Stronger damping indicates thicker emulsion core
-    thickness_microns = round(max(55.0, min(350.0, 75.0 + (damping_ratio - 1.0) * 65.0)), 1)
+    thickness_microns = round(_thickness(damping_ratio), 1)
+    thickness_low = round(_thickness(damping_ratio * 0.75), 1)
+    thickness_high = round(_thickness(damping_ratio * 1.25), 1)
     volume_m3 = round(area_sq_m * (thickness_microns * 1e-6), 3)
-    volume_barrels = round((volume_m3 * 1000.0) / 158.987, 1)
+    volume_barrels = _volume_bbls(thickness_microns)
+    volume_bbls_range = [_volume_bbls(thickness_low), _volume_bbls(thickness_high)]
     metric_tonnes = round(volume_m3 * 0.89, 1)
+    volume_assumptions = (
+        "Bonn-code band thickness from radar damping ratio ±25%% spread "
+        "(%.0f–%.0f um); emulsion water fraction unknown; single-scene "
+        "prototype estimate, not a validated mass balance."
+        % (thickness_low, thickness_high)
+    )
 
     if thickness_microns >= 200.0:
         bonn_code = "Bonn Code 5: Continuous Heavy Oil / Emulsion (> 200 µm)"
@@ -249,12 +274,17 @@ def execute_unet_segmentation(
         "area_sq_m": area_sq_m,
         "perimeter_m": perimeter_m,
         "pixel_area": int(pixel_area),
+        "gsd_m": float(gsd_m),
+        "detection_quality": detection_quality,
         "slick_percentage": slick_percentage,
         "confidence_score": confidence_score,
         "estimated_volume_bbls": volume_barrels,
+        "volume_bbls_range": volume_bbls_range,
         "volume_m3": volume_m3,
         "metric_tonnes": metric_tonnes,
         "thickness_microns": thickness_microns,
+        "thickness_microns_range": [thickness_low, thickness_high],
+        "volume_assumptions": volume_assumptions,
         "bonn_agreement_code": bonn_code,
         "spill_age_hours": spill_age_hours,
         "weathering_stage": weathering_stage,

@@ -4,9 +4,15 @@ from datetime import datetime
 
 
 class SpillAnalysisRequest(BaseModel):
-    image_url: str = Field(..., description="URL of the satellite image")
-    latitude: float = Field(..., description="Latitude of the spill origin")
-    longitude: float = Field(..., description="Longitude of the spill origin")
+    # SIH audit: reject out-of-range coordinates and empty image refs at the
+    # contract boundary (422) instead of queuing impossible pipelines.
+    # Field() bounds work on both pydantic v1 and v2.
+    image_url: str = Field(..., min_length=1, max_length=2048,
+                           description="URL, local path, or bundled sample name of the satellite image")
+    latitude: float = Field(..., ge=-90.0, le=90.0,
+                            description="Latitude of the spill origin (-90..90)")
+    longitude: float = Field(..., ge=-180.0, le=180.0,
+                             description="Longitude of the spill origin (-180..180)")
     detection_time: datetime = Field(..., description="ISO format detection timestamp")
 
 

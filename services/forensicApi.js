@@ -39,7 +39,7 @@ const ForensicApi = {
           gateway: "ONLINE — FASTAPI / CELERY (8000)",
           isMock: false,
           latencyMs: Math.max(8, latency),
-          activeModel: "U-Net + ESRGAN + Lagrangian v3.8",
+          activeModel: "Classical CV + RK4 ensemble v3.8 (prototype, no learned weights)",
           orbitSync: "SENTINEL-1 C-SAR"
         });
       } catch (e) {
@@ -47,7 +47,7 @@ const ForensicApi = {
           gateway: "OFFLINE — MOCK MODE",
           isMock: true,
           latencyMs: 18,
-          activeModel: "V.A.R.U.N.A Hydro-CNN v3.8",
+          activeModel: "Classical CV pipeline v3.8 (prototype, no learned weights)",
           orbitSync: "SENTINEL-1 C-SAR"
         });
       }
@@ -300,6 +300,29 @@ const ForensicApi = {
     });
   },
 
+
+  // Payload-derived integrity seal (audit fix): SHA-256 over canonical JSON
+  // when crypto.subtle exists, else a labelled FNV-1a fallback (non-secure
+  // contexts) — never a fixed magic string.
+  computeSeal: function(obj) {
+    const canonical = JSON.stringify(obj);
+    const fnv = (str) => {
+      let h = 0x811c9dc5;
+      for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+      return (h >>> 0).toString(16).padStart(8, "0");
+    };
+    const fallback = () => ({ hex: "fnv1a-" + fnv(canonical) + fnv(canonical + "#2"), algo: "FNV1A-FALLBACK" });
+    try {
+      if (typeof crypto !== "undefined" && crypto.subtle && crypto.subtle.digest) {
+        return crypto.subtle.digest("SHA-256", new TextEncoder().encode(canonical)).then((buf) => ({
+          hex: Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join(""),
+          algo: "SHA-256"
+        })).catch(fallback);
+      }
+    } catch (e) {}
+    return Promise.resolve(fallback());
+  },
+
   pollBackendTask: function(taskId, onDone) {
     let tries = 0;
     const timer = setInterval(async () => {
@@ -312,7 +335,14 @@ const ForensicApi = {
             || (data.result && data.result.status === "COMPLETED");
           if (done && data.result && data.result.vessels_scored) {
             clearInterval(timer);
-            onDone(ForensicApi.mapBackendVessels(data.result.vessels_scored, data.result.calculated_origin));
+            onDone(
+              ForensicApi.mapBackendVessels(data.result.vessels_scored, data.result.calculated_origin),
+              {
+                attribution_source: data.result.attribution_source || "backend-unspecified",
+                attribution_note: data.result.attribution_note || "",
+                origin: data.result.calculated_origin || null
+              }
+            );
             return;
           }
           if (data.status === "FAILURE") { clearInterval(timer); return; }
@@ -573,7 +603,8 @@ const ForensicApi = {
           station: reportData.station || "Regional Maritime Rescue Coordination Centre",
           frequency: reportData.frequency || "VHF Channel 16 / DSC",
           tier: reportData.tier || "TIER 2 // REGIONAL INTERCEPT",
-          status: "TRANSMITTED_AND_ACKNOWLEDGED",
+          status: "SIMULATED_DEMO_NO_TRANSMISSION",
+          simulated: true,
           interceptETA: reportData.etaMin ? `${reportData.etaMin} MIN` : "35 MIN",
           transmissionChecksum: "SHA-256: 4f8a9b2c1d0e3f5a7b8c9d0e1f2a3b4c5d6e7f8a"
         });

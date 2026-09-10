@@ -126,7 +126,13 @@ def _get_grid():
     candidate = os.getenv("VARUNA_FORCING_FILE") or _DEFAULT_GRID
     grid = None
     source = None
+    mtime = None
     if candidate and os.path.exists(candidate):
+        try:
+            mtime = datetime.datetime.fromtimestamp(
+                os.path.getmtime(candidate), tz=datetime.timezone.utc).isoformat()
+        except Exception:
+            mtime = None
         if candidate.lower().endswith((".nc", ".nc4", ".netcdf")):
             grid = _try_load_netcdf(candidate)
             source = f"NetCDF grid ({os.path.basename(candidate)})" if grid else None
@@ -138,6 +144,8 @@ def _get_grid():
                 grid = None
     _forcing_cache["grid"] = grid
     _forcing_cache["source"] = source
+    _forcing_cache["path"] = candidate
+    _forcing_cache["mtime"] = mtime
     return grid
 
 
@@ -528,9 +536,19 @@ def run_drift_hindcast(
     c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
     drift_distance_km = round(r_earth * c, 2)
 
+    grid_path = _forcing_cache.get("path")
+    grid_mtime = _forcing_cache.get("mtime")
+    forcing_grid_id = (
+        f"{os.path.basename(grid_path)}@{grid_mtime}"
+        if (_forcing_cache.get("grid") is not None and grid_path) else "none"
+    )
     env_data = {
         **metocean,
         "forcing_source": forcing_source,
+        # SIH audit: persist when/with-what the forcing was evaluated so a
+        # result can be traced to its inputs (provenance, not just a label).
+        "forcing_evaluated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "forcing_grid_id": forcing_grid_id,
         "drift_distance_km": drift_distance_km,
         "simulation_hours": simulation_hours,
         "time_of_discharge": time_of_discharge,

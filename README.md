@@ -339,9 +339,23 @@ V.A.R.U.N.A. is deployed on a decoupled, production-grade cloud architecture lev
 ## Responsible AI & Legal Evidentiary Standard
 
 Because maritime pollution investigations carry significant financial, legal, and regulatory consequences:
-* VARUNA provides **probabilistic investigative leads**, not automated prosecution.
-* The separation between **Observed Data $\to$ Neural Segmentation $\to$ Hydrodynamic Simulation $\to$ Correlated Telemetry** is strictly preserved.
-* Every generated Forensic Case File includes an immutable SHA-256 digital custody hash to prevent evidence tampering.
+* VARUNA provides **heuristic investigative priority leads** (weighted multi-factor scores), not probabilities and not automated prosecution.
+* The separation between **Observed Data $\to$ Classical Segmentation $\to$ Hydrodynamic Simulation $\to$ Correlated Telemetry** is strictly preserved, and every result carries its provenance (`attribution_source`, `forcing_source`, `detection_quality`).
+* Every generated Forensic Case File includes a SHA-256 seal computed over the result payload. It proves the report matches its inputs; it is NOT a legal chain of custody.
+
+---
+
+## Prototype Limits & Judge Notes (read before evaluating)
+
+Honest accounting of what this prototype is and is not:
+
+* **No trained neural weights are bundled.** The "ESRGAN" stage is a classical 4x enhancement chain (denoise + Lanczos + unsharp + CLAHE) and the "U-Net" stage is classical radar-vision segmentation (bilateral + Otsu + morphology + contours). Both run on real input pixels with input-dependent outputs (`scratch/test_vertical_slice.py` proves it), and both document that learned weights are the production swap-in. Per-scene precision/recall/IoU/Dice against labelled data, and look-alike (biogenic / low-wind / sediment) classification, do not exist yet.
+* **Volume is a range estimate, not a mass balance.** Results report `estimated_volume_bbls` together with `volume_bbls_range` and explicit `volume_assumptions` (Bonn-band thickness spread, emulsion water fraction unknown).
+* **Drift is an RK4 particle ensemble (default N=2000) with a 95% confidence ellipse**, forced by gridded file → live open APIs → regional climatology. The winning source, evaluation time, and grid version are persisted per run (`forcing_source`, `forcing_evaluated_at`, `forcing_grid_id`). Hindcast error against labelled historical spills is not yet evaluated.
+* **AIS attribution is a fallback chain with visible provenance**: live PostGIS `ST_DWithin` join → bundled trajectory file → deterministic synthetic sector profiles. Every result states its `attribution_source`, and the dashboard suspect panel shows it (`DATA: …` badge).
+* **Scores are heuristic priority indices, never probabilities; tiers never exonerate.** Labels: High-Priority Investigative Lead / Investigation Candidate / Lower Correlation / No Significant Correlation.
+* **Dispatch, dossier metadata, and seals are demo-grade.** Coast Guard dispatch is simulated locally; case refs, timestamps, and seals are payload-derived but have no external custody, signatures, or legal review.
+* **API contracts are validated** (coordinate ranges, nonempty image reference → 422), but there is no auth layer — appropriate for a judged prototype, not production.
 
 ---
 
