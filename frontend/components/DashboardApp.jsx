@@ -38,11 +38,18 @@ function ThreeBackground() {
     const container = mountRef.current;
     if (!container) return;
 
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    } catch (e) {
+      console.warn("WebGL unsupported, skipping ThreeBackground:", e);
+      return;
+    }
+
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
     camera.position.z = 180;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     container.appendChild(renderer.domElement);
@@ -119,12 +126,12 @@ function ThreeBackground() {
     window.addEventListener("resize", onResize);
 
     return () => {
-      cancelAnimationFrame(animId);
+      if (animId) cancelAnimationFrame(animId);
       window.removeEventListener("resize", onResize);
-      if (container.contains(renderer.domElement)) {
+      if (renderer && renderer.domElement && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
-      renderer.dispose();
+      if (renderer) renderer.dispose();
     };
   }, []);
 
@@ -141,12 +148,20 @@ function ThreeCorrelationScene({ vessels, activeScenario, selectedVessel, onSele
     const width = container.clientWidth || 500;
     const height = container.clientHeight || 360;
 
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    } catch (e) {
+      console.warn("WebGL unsupported in ThreeCorrelationScene:", e);
+      container.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#4ee7ff;font-family:monospace;font-size:11px;background:#04070d;">[3D Telemetry Canvas - WebGL Hardware Acceleration Unavailable]</div>';
+      return;
+    }
+
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
     camera.position.set(0, 60, 140);
     camera.lookAt(0, 0, 0);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     container.innerHTML = "";
@@ -273,14 +288,14 @@ function ThreeCorrelationScene({ vessels, activeScenario, selectedVessel, onSele
     animate();
 
     return () => {
-      cancelAnimationFrame(animId);
+      if (animId) cancelAnimationFrame(animId);
       container.removeEventListener("mousedown", onMouseDown);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
-      if (container.contains(renderer.domElement)) {
+      if (renderer && renderer.domElement && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
-      renderer.dispose();
+      if (renderer) renderer.dispose();
     };
   }, [vessels, activeScenario]);
 
@@ -1260,6 +1275,7 @@ function DashboardApp() {
   const [backendMeta, setBackendMeta] = useState(null);
   const [showCoastGuardModal, setShowCoastGuardModal] = useState(false);
   const [coastGuardDispatch, setCoastGuardDispatch] = useState(null);
+  const [targetVesselForReport, setTargetVesselForReport] = useState(null);
   const [timeString, setTimeString] = useState(new Date().toUTCString());
 
   const [currentUser, setCurrentUser] = useState(() => {
@@ -1429,7 +1445,7 @@ function DashboardApp() {
             <span>CASE FILE (PDF)</span>
           </button>
 
-          <div className="hidden xl:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-cyan-500/30 font-mono text-xs">
+          <div className="hidden md:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-cyan-500/30 font-mono text-xs">
             <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
             <div className="text-left leading-tight">
               <div className="text-[11px] font-bold text-white flex items-center gap-1.5">

@@ -136,7 +136,18 @@
   </style>
 </head>
 <body class="bg-[#04070d] text-white antialiased">
-  <div id="root"></div>
+  <div id="root">
+    <div style="position:fixed;inset:0;background-color:#04070d;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;">
+      <div style="width:42px;height:42px;border-radius:50%;border:2px solid rgba(78,231,255,0.2);border-top-color:#4ee7ff;animation:initialSpin 0.8s linear infinite;margin-bottom:14px;"></div>
+      <div style="color:#4ee7ff;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;">Initializing Forensic Ops Dashboard...</div>
+    </div>
+    <style>
+      @keyframes initialSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  </div>
 
   <script>
     // Optional: paste a VALID CARTO basemap key here to use CARTO tiles.
