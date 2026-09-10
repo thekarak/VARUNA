@@ -289,7 +289,7 @@ V.A.R.U.N.A. is deployed on a decoupled, production-grade cloud architecture lev
 +-------------------------------------------------------------+
 ```
 
-### 1. Frontend on Vercel
+### 1.Frontend on Vercel
 * **Platform**: [Vercel](https://vercel.com)
 * **Production URL**: `https://varuna-omega.vercel.app/` (or `/dashboard.html`)
 * **Framework**: React 18 + Tailwind CSS + Three.js + Leaflet & CARTO Basemaps
@@ -299,7 +299,7 @@ V.A.R.U.N.A. is deployed on a decoupled, production-grade cloud architecture lev
   * **Dynamic API Resolution**: Automatically connects to the live Render backend (`https://varuna-e1tx.onrender.com`) with client-side scientific fallback.
   * **Multi-Provider Resilient Basemaps**: Seamless failover between high-resolution OpenStreetMap, Esri World Ocean / Dark Canvas, and CARTO Basemaps, guaranteeing zero black-tile or watermark failures across all devices.
 
-### 2. Backend on Render
+### 2.Backend on Render
 * **Platform**: [Render](https://render.com)
 * **Production URL**: `https://varuna-e1tx.onrender.com`
 * **API Documentation**: `https://varuna-e1tx.onrender.com/docs` (Interactive OpenAPI / Swagger)
