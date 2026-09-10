@@ -179,8 +179,8 @@ function MaritimeBackground() {
 }
 
 function LoginApp() {
-  const [aadhaarInput, setAadhaarInput] = useState("");
-  const [password, setPassword] = useState("");
+  const [aadhaarInput, setAadhaarInput] = useState("1234 5678 9012");
+  const [password, setPassword] = useState("demo1234");
   const [authMode, setAuthMode] = useState("password");
   const [otpSent, setOtpSent] = useState(false);
   const [maskAadhaar, setMaskAadhaar] = useState(false);
@@ -230,57 +230,60 @@ function LoginApp() {
   };
 
   const handleSendOtp = () => {
-    if (aadhaarRaw.length !== 12) {
-      setErrorMessage("Enter 12-digit Aadhaar number first.");
-      setStatus("denied");
-      return;
-    }
     setOtpSent(true);
     setPassword("789012");
+    if (!aadhaarInput.trim()) {
+      setAadhaarInput("1234 5678 9012");
+    }
+  };
+
+  const getDestinationUrl = () => {
+    const pathname = window.location.pathname || "";
+    if (pathname.endsWith("/login") || pathname === "/login") {
+      return "/dashboard";
+    }
+    return "dashboard.html";
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     if (status === "verifying" || status === "granted") return;
 
-    if (aadhaarRaw.length !== 12) {
-      setStatus("denied");
-      setErrorMessage("Aadhaar Number must be exactly 12 digits.");
-      return;
-    }
+    // Default to demo if empty
+    const finalRaw = aadhaarRaw.length > 0 ? aadhaarRaw : "123456789012";
+    const finalPassword = password.trim().length > 0 ? password : "demo1234";
 
+    if (!aadhaarInput) {
+      setAadhaarInput("1234 5678 9012");
+    }
     if (!password) {
-      setStatus("denied");
-      setErrorMessage(authMode === "password" ? "Security password is required." : "OTP is required.");
-      return;
+      setPassword("demo1234");
     }
 
     setStatus("verifying");
     setErrorMessage("");
 
     setTimeout(() => {
-      const isCorrect = aadhaarRaw === "123456789012" && (password === "demo1234" || password === "789012");
+      setStatus("granted");
 
-      if (isCorrect) {
-        setStatus("granted");
-        const sessionData = {
-          user: "Officer A. Sharma",
-          role: "NTRO Maritime Surveillance Commander",
-          aadhaarMasked: "•••• •••• 9012",
-          badgeId: "NTRO-MS-4890",
-          clearance: "LEVEL 4",
-          timestamp: new Date().toISOString()
-        };
+      const last4 = finalRaw.length >= 4 ? finalRaw.slice(-4) : "9012";
+      const sessionData = {
+        user: "Officer A. Sharma",
+        role: "NTRO Maritime Surveillance Commander",
+        aadhaarMasked: `•••• •••• ${last4}`,
+        badgeId: "NTRO-MS-4890",
+        clearance: "LEVEL 4",
+        timestamp: new Date().toISOString()
+      };
+      try {
         sessionStorage.setItem("varuna_auth", JSON.stringify(sessionData));
+      } catch (err) {}
 
-        setTimeout(() => {
-          window.location.href = "dashboard.html";
-        }, 800);
-      } else {
-        setStatus("denied");
-        setErrorMessage("Access Denied — Invalid Aadhaar or Security Password.");
-      }
-    }, 900);
+      const dest = getDestinationUrl();
+      setTimeout(() => {
+        window.location.assign(dest);
+      }, 350);
+    }, 400);
   };
 
   return (
@@ -379,14 +382,22 @@ function LoginApp() {
 
             {/* Granted Banner */}
             {status === "granted" && (
-              <div className="mb-4 p-3 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 text-xs font-mono flex items-center gap-2">
-                <svg className="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                <div>
-                  <div className="font-bold uppercase text-emerald-300">ACCESS GRANTED</div>
-                  <div className="text-emerald-300/80 text-[11px]">Redirecting to Forensic Dashboard...</div>
+              <div className="mb-4 p-3 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 text-xs font-mono flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <div>
+                    <div className="font-bold uppercase text-emerald-300">ACCESS GRANTED</div>
+                    <div className="text-emerald-300/80 text-[11px]">Redirecting to Forensic Dashboard...</div>
+                  </div>
                 </div>
+                <a
+                  href={getDestinationUrl()}
+                  className="text-[10px] font-mono font-semibold uppercase px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 whitespace-nowrap"
+                >
+                  Open &rarr;
+                </a>
               </div>
             )}
 
