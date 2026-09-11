@@ -4,7 +4,7 @@
 
 **An AI-powered maritime forensic intelligence platform for detecting oil spills from satellite SAR imagery, reconstructing oceanographic drift origin, correlating AIS vessel trajectories, and identifying dark fleet activity.**
 
-Developed by **Team VARUNA**  
+Developed by **Team CODE_FORUN**  
 **JIS College of Engineering**  
 **Smart India Hackathon 2026**
 
